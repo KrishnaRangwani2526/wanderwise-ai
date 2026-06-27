@@ -42,15 +42,22 @@ const TOOLS = [
   { to: "/travel",   label: "Travel",   icon: MapPinned,        tint: "from-cyan-500 to-blue-600",      blurb: "Live route, viewpoints & nearby pings." },
 ] as const;
 
+import destManali from "@/assets/dest-manali.jpg";
+import destGoa from "@/assets/dest-goa.jpg";
+import destRishikesh from "@/assets/dest-rishikesh.jpg";
+import destJaisalmer from "@/assets/dest-jaisalmer.jpg";
+import destVaranasi from "@/assets/dest-varanasi.jpg";
+import destUdaipur from "@/assets/dest-udaipur.jpg";
+
 const TRENDING = [
-  { id: "manali",    name: "Manali",    state: "Himachal", img: "https://images.unsplash.com/photo-1626621341517-bbf3d9990a23?w=900&q=80&auto=format&fit=crop", tag: "Mountains" },
-  { id: "goa",       name: "Goa",       state: "Goa",      img: "https://images.unsplash.com/photo-1512343879784-a960bf40e7f2?w=900&q=80&auto=format&fit=crop", tag: "Beach" },
-  { id: "jaipur",    name: "Jaipur",    state: "Rajasthan",img: "https://images.unsplash.com/photo-1599661046289-e31897846e41?w=900&q=80&auto=format&fit=crop", tag: "Heritage" },
-  { id: "leh",       name: "Leh",       state: "Ladakh",   img: "https://images.unsplash.com/photo-1589551376879-d50b87739f33?w=900&q=80&auto=format&fit=crop", tag: "Adventure" },
-  { id: "rishikesh", name: "Rishikesh", state: "Uttarakhand", img: "https://images.unsplash.com/photo-1591018403220-3b5c66c70b00?w=900&q=80&auto=format&fit=crop", tag: "Spiritual" },
-  { id: "udaipur",   name: "Udaipur",   state: "Rajasthan",img: "https://images.unsplash.com/photo-1568454537842-d933259bb1ce?w=900&q=80&auto=format&fit=crop", tag: "Lakes" },
-  { id: "varanasi",  name: "Varanasi",  state: "UP",       img: "https://images.unsplash.com/photo-1561361513-2d000a50f0dc?w=900&q=80&auto=format&fit=crop", tag: "Spiritual" },
-  { id: "jaisalmer", name: "Jaisalmer", state: "Rajasthan",img: "https://images.unsplash.com/photo-1477587458883-47145ed94245?w=900&q=80&auto=format&fit=crop", tag: "Desert" },
+  { id: "manali",    name: "Manali",    state: "Himachal Pradesh", img: destManali,    tag: "Mountains" },
+  { id: "goa",       name: "Goa",       state: "Goa",              img: destGoa,       tag: "Beach" },
+  { id: "jaipur",    name: "Jaipur",    state: "Rajasthan",        img: heroJaipur,    tag: "Heritage" },
+  { id: "leh",       name: "Leh",       state: "Ladakh",           img: heroLadakh,    tag: "Adventure" },
+  { id: "rishikesh", name: "Rishikesh", state: "Uttarakhand",      img: destRishikesh, tag: "Spiritual" },
+  { id: "udaipur",   name: "Udaipur",   state: "Rajasthan",        img: destUdaipur,   tag: "Lakes" },
+  { id: "varanasi",  name: "Varanasi",  state: "Uttar Pradesh",    img: destVaranasi,  tag: "Spiritual" },
+  { id: "jaisalmer", name: "Jaisalmer", state: "Rajasthan",        img: destJaisalmer, tag: "Desert" },
 ];
 
 const INTERESTS = [
