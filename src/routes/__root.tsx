@@ -223,7 +223,7 @@ function SiteFooter() {
       <div className="mx-auto grid max-w-7xl gap-8 px-4 py-12 text-sm sm:grid-cols-3">
         <div>
           <div className="flex items-center gap-2 font-display font-bold">
-            <span className="grid h-7 w-7 place-items-center rounded-md bg-brand text-white">
+            <span className="grid h-7 w-7 place-items-center rounded-md bg-foreground text-background">
               <Compass className="h-4 w-4" />
             </span>
             WanderCompanion
