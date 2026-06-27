@@ -6,6 +6,11 @@ import {
   Mountain, Waves, Landmark, Utensils, Star,
 } from "lucide-react";
 
+import heroTaj from "@/assets/hero-taj.jpg";
+import heroKerala from "@/assets/hero-kerala.jpg";
+import heroLadakh from "@/assets/hero-ladakh.jpg";
+import heroJaipur from "@/assets/hero-jaipur.jpg";
+
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
@@ -21,30 +26,10 @@ export const Route = createFileRoute("/")({
 });
 
 const HERO_SLIDES = [
-  {
-    img: "https://images.unsplash.com/photo-1599661046289-e31897846e41?w=2000&q=80&auto=format&fit=crop",
-    title: "Wander like a local",
-    sub: "From the Himalayas to the backwaters — your trip, perfectly planned.",
-    tag: "Jaipur · Rajasthan",
-  },
-  {
-    img: "https://images.unsplash.com/photo-1512343879784-a960bf40e7f2?w=2000&q=80&auto=format&fit=crop",
-    title: "Chase sunsets on every coast",
-    sub: "Beaches, shacks and sundown cruises — Goa to the Andamans.",
-    tag: "Palolem · Goa",
-  },
-  {
-    img: "https://images.unsplash.com/photo-1626621341517-bbf3d9990a23?w=2000&q=80&auto=format&fit=crop",
-    title: "Roam where the mountains breathe",
-    sub: "High passes, alpine cafes and quiet monasteries await.",
-    tag: "Manali · Himachal",
-  },
-  {
-    img: "https://images.unsplash.com/photo-1561361513-2d000a50f0dc?w=2000&q=80&auto=format&fit=crop",
-    title: "Find the soul of every city",
-    sub: "Ghats at dawn, bazaars at dusk, stories in between.",
-    tag: "Varanasi · UP",
-  },
+  { img: heroTaj,    title: "Wander where stories begin",     sub: "Forts, ghats and palaces — India's living history at your pace.",      tag: "Agra · Uttar Pradesh" },
+  { img: heroKerala, title: "Drift through the backwaters",   sub: "Houseboats, palm-lined canals and slow Kerala sunsets.",               tag: "Alleppey · Kerala" },
+  { img: heroLadakh, title: "Breathe in the high Himalayas",  sub: "Monasteries, prayer flags and roads that touch the clouds.",          tag: "Leh · Ladakh" },
+  { img: heroJaipur, title: "Find magic in the Pink City",    sub: "Royal courtyards, bazaars and Rajasthani warmth.",                     tag: "Jaipur · Rajasthan" },
 ];
 
 const TOOLS = [
