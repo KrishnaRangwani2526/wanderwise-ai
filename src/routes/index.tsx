@@ -1,303 +1,344 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
 import {
-  Sparkles,
-  Search,
-  Map,
-  Sliders,
-  Camera,
-  Plane,
-  Navigation,
-  ArrowRight,
-  ArrowUpRight,
-  ShieldCheck,
-  Wifi,
-  Cpu,
+  Sparkles, ScanSearch, CalendarDays, SlidersHorizontal,
+  Image as ImageIcon, Plane, MapPinned, ArrowRight, Search,
+  Mountain, Waves, Landmark, Utensils, Star,
 } from "lucide-react";
-import { DESTINATIONS } from "@/data/destinations";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "WanderCompanion — Plan India trips smarter" },
+      { title: "WanderCompanion — Your complete India travel guide" },
       {
         name: "description",
         content:
-          "Seven focused tools — Dream, Analyze, Plan, Optimize, Sightsee, Book, Travel — for designing better India trips with transparent offline engines.",
-      },
-      { property: "og:title", content: "WanderCompanion — Plan India trips smarter" },
-      {
-        property: "og:description",
-        content: "Dream, analyze, plan, optimize, sightsee, book and travel — one clean workflow.",
-      },
-      {
-        property: "og:image",
-        content: "https://images.unsplash.com/photo-1564507592333-c60657eea523?w=1200",
+          "Dream, analyze, plan, optimize, sightsee, book and travel — seven smart tools to design unforgettable Indian trips.",
       },
     ],
   }),
-  component: Landing,
+  component: LandingPage,
 });
 
-type Feature = {
-  to: string;
-  label: string;
-  kicker: string;
-  desc: string;
-  number: string;
-  Icon: typeof Sparkles;
-};
-
-const FEATURES: Feature[] = [
-  { to: "/dream", label: "Dream", kicker: "Discover", number: "01", desc: "Pick your mood — mountains, monsoon, slow week. Get ranked destinations with reasoning shown.", Icon: Sparkles },
-  { to: "/analyze", label: "Analyze", kicker: "Audit", number: "02", desc: "Paste a URL, PDF or itinerary text. Extract structure, surface gaps, suggest fixes.", Icon: Search },
-  { to: "/plan", label: "Plan", kicker: "Itinerary", number: "03", desc: "Dates, travellers, likes, budget — three ranked day-by-day plans, side by side.", Icon: Map },
-  { to: "/optimize", label: "Optimize", kicker: "Refine", number: "04", desc: "Tighten by budget, days or must-sees. Compare ranks every variant transparently.", Icon: Sliders },
-  { to: "/sightsee", label: "Sightsee", kicker: "Visual", number: "05", desc: "A clean scenic gallery — proof of why you're going, before you commit.", Icon: Camera },
-  { to: "/book", label: "Book", kicker: "One-tap", number: "06", desc: "Save your profile once. Compare flights, trains, hotels — deep-link to the official site.", Icon: Plane },
-  { to: "/travel", label: "Travel", kicker: "On-trip", number: "07", desc: "Live map of your route — viewpoints, famous food, detours as you go.", Icon: Navigation },
+const HERO_SLIDES = [
+  {
+    img: "https://images.unsplash.com/photo-1599661046289-e31897846e41?w=2000&q=80&auto=format&fit=crop",
+    title: "Wander like a local",
+    sub: "From the Himalayas to the backwaters — your trip, perfectly planned.",
+    tag: "Jaipur · Rajasthan",
+  },
+  {
+    img: "https://images.unsplash.com/photo-1512343879784-a960bf40e7f2?w=2000&q=80&auto=format&fit=crop",
+    title: "Chase sunsets on every coast",
+    sub: "Beaches, shacks and sundown cruises — Goa to the Andamans.",
+    tag: "Palolem · Goa",
+  },
+  {
+    img: "https://images.unsplash.com/photo-1626621341517-bbf3d9990a23?w=2000&q=80&auto=format&fit=crop",
+    title: "Roam where the mountains breathe",
+    sub: "High passes, alpine cafes and quiet monasteries await.",
+    tag: "Manali · Himachal",
+  },
+  {
+    img: "https://images.unsplash.com/photo-1561361513-2d000a50f0dc?w=2000&q=80&auto=format&fit=crop",
+    title: "Find the soul of every city",
+    sub: "Ghats at dawn, bazaars at dusk, stories in between.",
+    tag: "Varanasi · UP",
+  },
 ];
 
-function Landing() {
-  const featured = DESTINATIONS.slice(0, 6);
+const TOOLS = [
+  { to: "/dream",    label: "Dream",    icon: Sparkles,         tint: "from-fuchsia-500 to-pink-500",   blurb: "Discover by mood, season and budget." },
+  { to: "/analyze",  label: "Analyze",  icon: ScanSearch,       tint: "from-amber-500 to-orange-600",   blurb: "Paste any URL, PDF or reel — get insights." },
+  { to: "/plan",     label: "Plan",     icon: CalendarDays,     tint: "from-sky-500 to-indigo-600",     blurb: "Day-by-day itinerary in 3 variants." },
+  { to: "/optimize", label: "Optimize", icon: SlidersHorizontal,tint: "from-emerald-500 to-teal-600",   blurb: "Tune for budget, days & must-sees." },
+  { to: "/sightsee", label: "Sightsee", icon: ImageIcon,        tint: "from-rose-500 to-red-600",       blurb: "Curated galleries of every destination." },
+  { to: "/book",     label: "Book",     icon: Plane,            tint: "from-violet-500 to-purple-700",  blurb: "Flights, trains & hotels — one place." },
+  { to: "/travel",   label: "Travel",   icon: MapPinned,        tint: "from-cyan-500 to-blue-600",      blurb: "Live route, viewpoints & nearby pings." },
+] as const;
 
+const TRENDING = [
+  { id: "manali",    name: "Manali",    state: "Himachal", img: "https://images.unsplash.com/photo-1626621341517-bbf3d9990a23?w=900&q=80&auto=format&fit=crop", tag: "Mountains" },
+  { id: "goa",       name: "Goa",       state: "Goa",      img: "https://images.unsplash.com/photo-1512343879784-a960bf40e7f2?w=900&q=80&auto=format&fit=crop", tag: "Beach" },
+  { id: "jaipur",    name: "Jaipur",    state: "Rajasthan",img: "https://images.unsplash.com/photo-1599661046289-e31897846e41?w=900&q=80&auto=format&fit=crop", tag: "Heritage" },
+  { id: "leh",       name: "Leh",       state: "Ladakh",   img: "https://images.unsplash.com/photo-1589551376879-d50b87739f33?w=900&q=80&auto=format&fit=crop", tag: "Adventure" },
+  { id: "rishikesh", name: "Rishikesh", state: "Uttarakhand", img: "https://images.unsplash.com/photo-1591018403220-3b5c66c70b00?w=900&q=80&auto=format&fit=crop", tag: "Spiritual" },
+  { id: "udaipur",   name: "Udaipur",   state: "Rajasthan",img: "https://images.unsplash.com/photo-1568454537842-d933259bb1ce?w=900&q=80&auto=format&fit=crop", tag: "Lakes" },
+  { id: "varanasi",  name: "Varanasi",  state: "UP",       img: "https://images.unsplash.com/photo-1561361513-2d000a50f0dc?w=900&q=80&auto=format&fit=crop", tag: "Spiritual" },
+  { id: "jaisalmer", name: "Jaisalmer", state: "Rajasthan",img: "https://images.unsplash.com/photo-1477587458883-47145ed94245?w=900&q=80&auto=format&fit=crop", tag: "Desert" },
+];
+
+const INTERESTS = [
+  { label: "Mountains", icon: Mountain, color: "bg-indigo-50 text-indigo-700 ring-indigo-200" },
+  { label: "Beaches",   icon: Waves,    color: "bg-sky-50 text-sky-700 ring-sky-200" },
+  { label: "Heritage",  icon: Landmark, color: "bg-amber-50 text-amber-700 ring-amber-200" },
+  { label: "Food",      icon: Utensils, color: "bg-rose-50 text-rose-700 ring-rose-200" },
+];
+
+function HeroCarousel() {
+  const [i, setI] = useState(0);
+  useEffect(() => {
+    const t = setInterval(() => setI((x) => (x + 1) % HERO_SLIDES.length), 5200);
+    return () => clearInterval(t);
+  }, []);
   return (
-    <div>
-      {/* HERO */}
-      <section className="relative overflow-hidden border-b border-border bg-hero">
-        <div className="mx-auto max-w-7xl px-4 py-16 sm:py-24">
-          <div className="grid items-center gap-12 lg:grid-cols-[1.1fr_1fr]">
-            <div>
-              <div className="inline-flex items-center gap-2 rounded-full border border-border bg-card/80 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground backdrop-blur">
-                <span className="inline-block h-1.5 w-1.5 rounded-full bg-brand" />
-                A field guide to travelling India
-              </div>
-              <h1 className="mt-6 font-display text-4xl font-bold leading-[1.05] tracking-tight text-foreground sm:text-6xl lg:text-[4.25rem]">
-                Plan your next trip,
-                <br />
-                <span className="text-brand-gradient">end&nbsp;to&nbsp;end.</span>
-              </h1>
-              <p className="mt-6 max-w-xl text-[15px] leading-relaxed text-muted-foreground sm:text-base">
-                Seven focused tools — <strong className="font-semibold text-foreground">Dream, Analyze, Plan, Optimize, Sightsee, Book, Travel</strong>.
-                Built on transparent offline engines, sharpened by AI only where it helps. No accounts, no upsells.
-              </p>
-              <div className="mt-8 flex flex-wrap items-center gap-3">
-                <Link
-                  to="/dream"
-                  className="group inline-flex items-center gap-2 rounded-full bg-foreground px-5 py-3 text-sm font-semibold text-background transition hover:opacity-90"
-                >
-                  Start with Dream
-                  <ArrowUpRight className="h-4 w-4 transition group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-                </Link>
-                <Link
-                  to="/analyze"
-                  className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-5 py-3 text-sm font-semibold text-foreground transition hover:bg-secondary"
-                >
-                  Audit an itinerary
-                </Link>
-              </div>
-              <dl className="mt-10 grid max-w-md grid-cols-3 gap-6 border-t border-border pt-6">
-                <Stat n="20+" l="Destinations" />
-                <Stat n="8" l="Smart engines" />
-                <Stat n="0" l="Signups" />
-              </dl>
-            </div>
-
-            {/* Hero visual: collage with one signature image */}
-            <div className="relative">
-              <div className="relative aspect-[4/5] overflow-hidden rounded-3xl border border-border bg-secondary shadow-card">
-                <img
-                  src="https://images.unsplash.com/photo-1564507592333-c60657eea523?w=1200&q=80"
-                  alt="Taj Mahal at dawn"
-                  className="h-full w-full object-cover"
-                  loading="eager"
-                  decoding="async"
-                />
-                <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-foreground/70 via-foreground/20 to-transparent p-5">
-                  <div className="text-[10px] font-semibold uppercase tracking-[0.2em] text-background/80">Featured</div>
-                  <div className="font-display text-lg font-semibold text-background">Agra at first light</div>
-                </div>
-              </div>
-              <div className="absolute -bottom-6 -left-4 hidden h-40 w-40 overflow-hidden rounded-2xl border-4 border-background shadow-card sm:block">
-                <img
-                  src="https://images.unsplash.com/photo-1602215890259-bf3a8c534b87?w=600&q=80"
-                  alt="Kerala backwaters"
-                  className="h-full w-full object-cover"
-                />
-              </div>
-              <div className="absolute -top-4 -right-3 hidden rounded-2xl border border-border bg-card px-3 py-2 shadow-card sm:flex sm:items-center sm:gap-2">
-                <span className="inline-block h-2 w-2 rounded-full bg-brand" />
-                <span className="text-xs font-semibold text-foreground">Engines running locally</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Trust strip */}
-          <div className="mt-12 grid gap-3 border-t border-border pt-6 text-sm text-muted-foreground sm:grid-cols-3">
-            <TrustItem Icon={Cpu} title="Deterministic engines" sub="Recommend · Cost · Rank · Route" />
-            <TrustItem Icon={Wifi} title="AI where it helps" sub="Scraping, extraction, summarisation" />
-            <TrustItem Icon={ShieldCheck} title="Privacy by default" sub="No account · No tracking · Local profile" />
-          </div>
+    <div className="relative h-[78vh] min-h-[520px] w-full overflow-hidden">
+      {HERO_SLIDES.map((s, idx) => (
+        <div
+          key={s.img}
+          className="absolute inset-0 transition-opacity duration-1000 ease-out"
+          style={{ opacity: idx === i ? 1 : 0 }}
+        >
+          <img src={s.img} alt={s.title} className="h-full w-full object-cover animate-[kenburns_18s_ease-in-out_infinite_alternate]" />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/10 to-black/70" />
+          <div className="absolute inset-0 bg-gradient-to-tr from-indigo-900/40 via-transparent to-orange-500/30" />
         </div>
-      </section>
+      ))}
 
-      {/* SEVEN TOOLS — clean card grid */}
-      <section className="mx-auto max-w-7xl px-4 py-20">
-        <header className="mb-10 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-          <div>
-            <div className="text-[11px] font-semibold uppercase tracking-[0.22em] text-brand">The workflow</div>
-            <h2 className="mt-2 font-display text-3xl font-bold tracking-tight sm:text-4xl">
-              Seven tools, one journey.
-            </h2>
-            <p className="mt-2 max-w-xl text-muted-foreground">
-              Each tool stands on its own. Together, they read like chapters — Dream feeds Plan, Plan feeds Optimize, the whole trip lights up on Travel.
-            </p>
-          </div>
+      <div className="relative z-10 mx-auto flex h-full max-w-7xl flex-col justify-end px-5 pb-12 sm:pb-20 text-white">
+        <span className="mb-3 inline-flex w-fit items-center gap-1.5 rounded-full bg-white/15 px-3 py-1 text-[11px] font-semibold uppercase tracking-wider backdrop-blur">
+          <Star className="h-3 w-3 fill-yellow-300 text-yellow-300" /> {HERO_SLIDES[i].tag}
+        </span>
+        <h1 className="font-display max-w-3xl text-4xl font-extrabold leading-[1.05] tracking-tight sm:text-6xl md:text-7xl drop-shadow-lg">
+          {HERO_SLIDES[i].title}
+        </h1>
+        <p className="mt-4 max-w-xl text-base text-white/90 sm:text-lg">{HERO_SLIDES[i].sub}</p>
+
+        {/* Search bar */}
+        <form
+          onSubmit={(e) => e.preventDefault()}
+          className="mt-7 flex w-full max-w-2xl items-center gap-2 rounded-full bg-white p-1.5 shadow-2xl ring-1 ring-black/5"
+        >
+          <Search className="ml-3 h-5 w-5 shrink-0 text-muted-foreground" />
+          <input
+            placeholder="Where do you dream of going? e.g. Manali in December"
+            className="min-w-0 flex-1 bg-transparent px-1 py-2 text-sm text-foreground outline-none placeholder:text-muted-foreground sm:text-base"
+          />
           <Link
             to="/dream"
-            className="inline-flex shrink-0 items-center gap-1 text-sm font-semibold text-foreground hover:text-brand"
+            className="inline-flex items-center gap-1 rounded-full bg-gradient-to-r from-orange-500 to-pink-600 px-4 py-2.5 text-sm font-semibold text-white shadow-lg hover:opacity-95 sm:px-5"
           >
-            Begin <ArrowRight className="h-4 w-4" />
+            Dream <ArrowRight className="h-4 w-4" />
           </Link>
-        </header>
+        </form>
 
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {FEATURES.map((f) => (
+        {/* Interest chips */}
+        <div className="mt-5 flex flex-wrap gap-2">
+          {INTERESTS.map((c) => (
             <Link
-              key={f.to}
-              to={f.to}
-              className="group relative flex flex-col rounded-2xl border border-border bg-card p-5 transition hover:-translate-y-0.5 hover:border-foreground/30 hover:shadow-card"
+              key={c.label}
+              to="/dream"
+              className="inline-flex items-center gap-1.5 rounded-full bg-white/95 px-3 py-1.5 text-xs font-semibold text-foreground shadow ring-1 ring-black/5 transition hover:scale-105"
             >
-              <div className="flex items-center justify-between">
-                <span className="grid h-10 w-10 place-items-center rounded-xl bg-brand-soft text-foreground transition group-hover:bg-brand group-hover:text-white">
-                  <f.Icon className="h-5 w-5" />
-                </span>
-                <span className="font-display text-xs font-bold tracking-wider text-muted-foreground">
-                  {f.number}
-                </span>
-              </div>
-              <div className="mt-5 text-[10px] font-semibold uppercase tracking-[0.18em] text-brand">
-                {f.kicker}
-              </div>
-              <h3 className="mt-1 font-display text-xl font-bold tracking-tight text-foreground">
-                {f.label}
-              </h3>
-              <p className="mt-2 flex-1 text-[13.5px] leading-relaxed text-muted-foreground">
-                {f.desc}
-              </p>
-              <div className="mt-4 inline-flex items-center gap-1 text-xs font-semibold text-foreground/80 transition group-hover:gap-2 group-hover:text-brand">
-                Open <ArrowRight className="h-3.5 w-3.5" />
-              </div>
+              <c.icon className="h-3.5 w-3.5" /> {c.label}
             </Link>
           ))}
         </div>
-      </section>
 
-      {/* FEATURED DESTINATIONS */}
-      <section className="border-y border-border bg-secondary/40">
-        <div className="mx-auto max-w-7xl px-4 py-20">
-          <header className="mb-8 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-            <div>
-              <div className="text-[11px] font-semibold uppercase tracking-[0.22em] text-brand">Destinations</div>
-              <h2 className="mt-2 font-display text-3xl font-bold tracking-tight sm:text-4xl">
-                Six places to begin with.
-              </h2>
-            </div>
-            <Link
-              to="/sightsee"
-              className="inline-flex items-center gap-1 text-sm font-semibold text-foreground hover:text-brand"
-            >
-              See the full gallery <ArrowRight className="h-4 w-4" />
-            </Link>
-          </header>
+        {/* slide dots */}
+        <div className="mt-8 flex gap-1.5">
+          {HERO_SLIDES.map((_, idx) => (
+            <button
+              key={idx}
+              onClick={() => setI(idx)}
+              aria-label={`slide ${idx + 1}`}
+              className={`h-1.5 rounded-full transition-all ${idx === i ? "w-8 bg-white" : "w-3 bg-white/50"}`}
+            />
+          ))}
+        </div>
+      </div>
 
-          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {featured.map((d) => (
+      <style>{`
+        @keyframes kenburns {
+          from { transform: scale(1) translate(0,0); }
+          to   { transform: scale(1.12) translate(-1%, -1.5%); }
+        }
+      `}</style>
+    </div>
+  );
+}
+
+function ToolsGrid() {
+  return (
+    <section className="relative -mt-12 sm:-mt-16 px-4">
+      <div className="mx-auto max-w-7xl">
+        <div className="rounded-3xl bg-white p-3 shadow-2xl ring-1 ring-black/5 sm:p-4">
+          <div className="grid grid-cols-2 gap-2 sm:grid-cols-4 lg:grid-cols-7">
+            {TOOLS.map((t) => (
               <Link
-                key={d.id}
-                to="/plan"
-                search={{ dest: d.id }}
-                className="group relative overflow-hidden rounded-2xl border border-border bg-card transition hover:-translate-y-0.5 hover:shadow-card"
+                key={t.to}
+                to={t.to}
+                className="group relative flex flex-col items-center justify-center gap-2 overflow-hidden rounded-2xl p-3 text-center transition hover:-translate-y-0.5"
               >
-                <div className="relative aspect-[4/3] overflow-hidden bg-secondary">
-                  <img
-                    src={d.hero_image}
-                    alt={d.name}
-                    loading="lazy"
-                    decoding="async"
-                    className="absolute inset-0 h-full w-full object-cover transition duration-700 group-hover:scale-[1.04]"
-                  />
-                  <div className="absolute left-3 top-3 inline-flex items-center gap-1 rounded-full bg-background/95 px-2.5 py-1 text-[11px] font-semibold text-foreground shadow-soft">
-                    ₹{d.cost_per_day_inr}/day
-                  </div>
-                </div>
-                <div className="p-5">
-                  <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-                    {d.state}
-                  </div>
-                  <h3 className="mt-1 font-display text-lg font-bold tracking-tight text-foreground">
-                    {d.name}
-                  </h3>
-                  <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">{d.tagline}</p>
-                </div>
+                <span className={`relative grid h-12 w-12 place-items-center rounded-2xl bg-gradient-to-br ${t.tint} text-white shadow-lg`}>
+                  <t.icon className="h-6 w-6" strokeWidth={2.25} />
+                </span>
+                <span className="text-[13px] font-bold tracking-tight text-foreground">{t.label}</span>
+                <span className="hidden text-[11px] leading-tight text-muted-foreground sm:block">{t.blurb}</span>
               </Link>
             ))}
           </div>
         </div>
-      </section>
-
-      {/* CTA */}
-      <section className="border-b border-border">
-        <div className="mx-auto max-w-4xl px-4 py-20 text-center">
-          <div className="text-[11px] font-semibold uppercase tracking-[0.22em] text-brand">
-            Ready when you are
-          </div>
-          <h2 className="mt-3 font-display text-3xl font-bold tracking-tight text-foreground sm:text-5xl">
-            Compose a trip that actually <span className="text-brand-gradient">fits you.</span>
-          </h2>
-          <p className="mx-auto mt-4 max-w-xl text-muted-foreground">
-            Start with what you love. End with a route, a budget, and a booking flow you can trust.
-          </p>
-          <div className="mt-8 flex flex-wrap justify-center gap-3">
-            <Link
-              to="/dream"
-              className="inline-flex items-center gap-2 rounded-full bg-foreground px-6 py-3 text-sm font-semibold text-background transition hover:opacity-90"
-            >
-              Start with Dream <ArrowUpRight className="h-4 w-4" />
-            </Link>
-            <Link
-              to="/plan"
-              className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-6 py-3 text-sm font-semibold text-foreground transition hover:bg-secondary"
-            >
-              Jump to Plan
-            </Link>
-          </div>
-        </div>
-      </section>
-    </div>
-  );
-}
-
-function Stat({ n, l }: { n: string; l: string }) {
-  return (
-    <div>
-      <dt className="text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">{l}</dt>
-      <dd className="mt-1 font-display text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
-        {n}
-      </dd>
-    </div>
-  );
-}
-
-function TrustItem({ Icon, title, sub }: { Icon: typeof Sparkles; title: string; sub: string }) {
-  return (
-    <div className="flex items-start gap-3">
-      <span className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-secondary text-foreground">
-        <Icon className="h-4 w-4" />
-      </span>
-      <div className="min-w-0">
-        <div className="text-sm font-semibold text-foreground">{title}</div>
-        <div className="text-xs text-muted-foreground">{sub}</div>
       </div>
+    </section>
+  );
+}
+
+function FlightTicker() {
+  const rows = [
+    { route: "DEL → GOI", carrier: "IndiGo",  price: "₹5,500", time: "2h 35m" },
+    { route: "BLR → IXL", carrier: "Vistara", price: "₹9,800", time: "4h 10m" },
+    { route: "BOM → JAI", carrier: "Akasa",   price: "₹3,200", time: "1h 45m" },
+    { route: "CCU → MAA", carrier: "Air India", price: "₹4,150", time: "2h 25m" },
+    { route: "DEL → SXR", carrier: "SpiceJet", price: "₹4,600", time: "1h 30m" },
+    { route: "HYD → COK", carrier: "IndiGo",  price: "₹3,900", time: "1h 35m" },
+  ];
+  const doubled = [...rows, ...rows];
+  return (
+    <section className="border-y border-border bg-gradient-to-r from-sky-50 via-indigo-50 to-rose-50 py-3">
+      <div className="mask-fade-x overflow-hidden">
+        <div className="flex animate-marquee gap-8 whitespace-nowrap text-[13px]">
+          {doubled.map((r, i) => (
+            <span key={i} className="flex items-center gap-2 font-medium text-foreground/80">
+              <Plane className="h-3.5 w-3.5 text-indigo-600" />
+              <b>{r.route}</b>
+              <span className="text-muted-foreground">· {r.carrier}</span>
+              <span className="text-emerald-700 font-semibold">{r.price}</span>
+              <span className="text-muted-foreground">· {r.time}</span>
+            </span>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function Trending() {
+  return (
+    <section className="px-4 py-16 sm:py-24">
+      <div className="mx-auto max-w-7xl">
+        <div className="flex flex-wrap items-end justify-between gap-3">
+          <div>
+            <p className="text-xs font-bold uppercase tracking-wider text-orange-600">Trending destinations</p>
+            <h2 className="font-display mt-1 text-3xl font-bold tracking-tight sm:text-4xl">Where India is going this season</h2>
+          </div>
+          <Link to="/sightsee" className="text-sm font-semibold text-indigo-600 hover:underline">
+            See all galleries →
+          </Link>
+        </div>
+
+        <div className="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+          {TRENDING.map((d) => (
+            <Link
+              key={d.id}
+              to="/sightsee"
+              className="group relative block aspect-[3/4] overflow-hidden rounded-2xl shadow-card"
+            >
+              <img src={d.img} alt={d.name} loading="lazy" className="h-full w-full object-cover transition duration-700 group-hover:scale-110" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+              <span className="absolute top-3 left-3 rounded-full bg-white/95 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-foreground">
+                {d.tag}
+              </span>
+              <div className="absolute bottom-3 left-3 right-3 text-white">
+                <div className="font-display text-xl font-bold leading-tight">{d.name}</div>
+                <div className="text-xs text-white/80">{d.state}</div>
+              </div>
+            </Link>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function HowItWorks() {
+  const steps = [
+    { n: "01", title: "Dream it",  text: "Tell us your mood, season and budget — we surface ranked destinations.", color: "from-fuchsia-500 to-pink-500" },
+    { n: "02", title: "Plan it",   text: "Get three day-by-day itineraries you can tune for pace and price.",     color: "from-sky-500 to-indigo-600" },
+    { n: "03", title: "Travel it", text: "One-tap booking links + live route map with viewpoints en route.",      color: "from-emerald-500 to-teal-600" },
+  ];
+  return (
+    <section className="bg-gradient-to-b from-white to-secondary/40 px-4 py-16 sm:py-24">
+      <div className="mx-auto max-w-7xl">
+        <p className="text-xs font-bold uppercase tracking-wider text-indigo-600">How it works</p>
+        <h2 className="font-display mt-1 text-3xl font-bold tracking-tight sm:text-4xl">Three steps from idea to itinerary</h2>
+        <div className="mt-10 grid gap-5 sm:grid-cols-3">
+          {steps.map((s) => (
+            <div key={s.n} className="relative overflow-hidden rounded-3xl bg-white p-7 shadow-card ring-1 ring-black/5">
+              <div className={`absolute -right-8 -top-8 h-32 w-32 rounded-full bg-gradient-to-br ${s.color} opacity-20 blur-2xl`} />
+              <div className={`inline-flex rounded-full bg-gradient-to-r ${s.color} bg-clip-text text-4xl font-black text-transparent`}>{s.n}</div>
+              <h3 className="font-display mt-3 text-2xl font-bold">{s.title}</h3>
+              <p className="mt-2 text-sm text-muted-foreground">{s.text}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function FeatureGrid() {
+  return (
+    <section className="px-4 py-16 sm:py-24">
+      <div className="mx-auto max-w-7xl">
+        <p className="text-xs font-bold uppercase tracking-wider text-rose-600">Why WanderCompanion</p>
+        <h2 className="font-display mt-1 text-3xl font-bold tracking-tight sm:text-4xl">Seven smart tools, zero noise</h2>
+        <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {TOOLS.map((t) => (
+            <Link
+              key={t.to}
+              to={t.to}
+              className="group relative overflow-hidden rounded-2xl border border-border bg-white p-6 transition hover:shadow-card"
+            >
+              <div className={`mb-4 inline-flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br ${t.tint} text-white shadow`}>
+                <t.icon className="h-5 w-5" />
+              </div>
+              <h3 className="font-display text-xl font-bold">{t.label}</h3>
+              <p className="mt-1.5 text-sm text-muted-foreground">{t.blurb}</p>
+              <span className="mt-4 inline-flex items-center gap-1 text-xs font-semibold text-indigo-600 opacity-0 transition group-hover:opacity-100">
+                Open {t.label} <ArrowRight className="h-3.5 w-3.5" />
+              </span>
+            </Link>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function FinalCTA() {
+  return (
+    <section className="relative overflow-hidden px-4 pb-20">
+      <div className="mx-auto max-w-7xl overflow-hidden rounded-3xl bg-gradient-to-br from-indigo-600 via-violet-600 to-pink-600 px-8 py-14 text-center text-white shadow-2xl sm:px-12 sm:py-20">
+        <h2 className="font-display text-3xl font-extrabold leading-tight sm:text-5xl">
+          Your next trip is one dream away.
+        </h2>
+        <p className="mx-auto mt-3 max-w-xl text-white/90">
+          Free, offline-friendly, and built for travelers — not algorithms.
+        </p>
+        <div className="mt-7 flex flex-wrap justify-center gap-3">
+          <Link to="/dream" className="rounded-full bg-white px-6 py-3 text-sm font-bold text-indigo-700 shadow-lg hover:scale-105 transition">
+            Start dreaming
+          </Link>
+          <Link to="/analyze" className="rounded-full bg-white/15 px-6 py-3 text-sm font-bold text-white ring-1 ring-white/30 backdrop-blur hover:bg-white/25 transition">
+            Analyze an itinerary
+          </Link>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function LandingPage() {
+  return (
+    <div className="bg-background">
+      <HeroCarousel />
+      <ToolsGrid />
+      <FlightTicker />
+      <Trending />
+      <HowItWorks />
+      <FeatureGrid />
+      <FinalCTA />
     </div>
   );
 }

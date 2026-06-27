@@ -14,13 +14,13 @@ import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 
 const NAV = [
-  { to: "/dream", label: "Dream" },
-  { to: "/analyze", label: "Analyze" },
-  { to: "/plan", label: "Plan" },
-  { to: "/optimize", label: "Optimize" },
-  { to: "/sightsee", label: "Sightsee" },
-  { to: "/book", label: "Book" },
-  { to: "/travel", label: "Travel" },
+  { to: "/dream",    label: "Dream",    dot: "bg-pink-500" },
+  { to: "/analyze",  label: "Analyze",  dot: "bg-orange-500" },
+  { to: "/plan",     label: "Plan",     dot: "bg-indigo-500" },
+  { to: "/optimize", label: "Optimize", dot: "bg-emerald-500" },
+  { to: "/sightsee", label: "Sightsee", dot: "bg-rose-500" },
+  { to: "/book",     label: "Book",     dot: "bg-violet-500" },
+  { to: "/travel",   label: "Travel",   dot: "bg-cyan-500" },
 ] as const;
 
 function NotFoundComponent() {
@@ -146,17 +146,18 @@ function SiteHeader() {
           </span>
         </Link>
 
-        <nav className="hidden items-center gap-1 md:flex">
+        <nav className="hidden items-center gap-0.5 md:flex">
           {NAV.map((n) => (
             <Link
               key={n.to}
               to={n.to}
-              className="rounded-full px-3 py-1.5 text-[13px] font-medium text-foreground/70 transition hover:bg-secondary hover:text-foreground"
+              className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[13px] font-medium text-foreground/70 transition hover:bg-secondary hover:text-foreground"
               activeProps={{
                 className:
-                  "rounded-full bg-secondary px-3 py-1.5 text-[13px] font-semibold text-foreground",
+                  "inline-flex items-center gap-1.5 rounded-full bg-secondary px-3 py-1.5 text-[13px] font-semibold text-foreground",
               }}
             >
+              <span className={`h-1.5 w-1.5 rounded-full ${n.dot}`} />
               {n.label}
             </Link>
           ))}
@@ -188,12 +189,13 @@ function SiteHeader() {
                 <Link
                   to={n.to}
                   onClick={() => setOpen(false)}
-                  className="block rounded-lg px-3 py-2.5 text-sm font-medium text-foreground/80 hover:bg-secondary"
+                  className="flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm font-medium text-foreground/80 hover:bg-secondary"
                   activeProps={{
                     className:
-                      "block rounded-lg bg-secondary px-3 py-2.5 text-sm font-semibold text-foreground",
+                      "flex items-center gap-2 rounded-lg bg-secondary px-3 py-2.5 text-sm font-semibold text-foreground",
                   }}
                 >
+                  <span className={`h-2 w-2 rounded-full ${n.dot}`} />
                   {n.label}
                 </Link>
               </li>

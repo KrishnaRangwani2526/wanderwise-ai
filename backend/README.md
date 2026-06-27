@@ -1,30 +1,35 @@
-# WanderCompanion — Python Reference Backend
+# WanderCompanion — Local Engine
 
-A parallel, fully-offline FastAPI implementation of the same engines that power
-the TypeScript app. Useful for running engines locally outside the browser,
-batch jobs, or experimentation.
+Pure-Python, offline backend. No Supabase, no cloud, no accounts.
 
 ## Run
-
 ```bash
 cd backend
-python -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
 uvicorn main:app --reload --port 8000
 ```
 
-API will be on http://localhost:8000 — try `GET /destinations` or
-`POST /dream` with a JSON body.
+The frontend talks to `http://localhost:8000` (override with
+`VITE_API_BASE` in `.env` if needed).
 
 ## Endpoints
+| Method | Path                | Purpose                                    |
+| ------ | ------------------- | ------------------------------------------ |
+| GET    | `/health`           | sanity check + learned counters            |
+| GET    | `/destinations`     | list of seeded destinations w/ photos      |
+| POST   | `/dream`            | recommend ranked destinations by interest  |
+| POST   | `/cost`             | itemized cost for a destination/style      |
+| POST   | `/rank`             | rank arbitrary options (multi-criteria)    |
+| POST   | `/analyze`          | analyze free-form itinerary text/URL       |
+| POST   | `/plan`             | 3 day-by-day itinerary variants            |
+| POST   | `/optimize`         | plan + budget/must-include filter          |
+| GET    | `/sightsee/{id}`    | curated gallery for a destination          |
+| POST   | `/book/search`      | flights + trains + hotels + best combo     |
+| POST   | `/travel/route`     | TSP-ordered stops + nearby pings           |
+| POST   | `/feedback`         | persist 👍 / 👎 for learning               |
+| GET    | `/learned`          | dump of learning store                     |
 
-| Method | Path             | Engine                  |
-| ------ | ---------------- | ----------------------- |
-| GET    | `/destinations`  | dataset                 |
-| POST   | `/dream`         | recommendation + cost + rank |
-| POST   | `/cost`          | cost estimation         |
-| POST   | `/rank`          | compare & rank          |
-| GET    | `/health`        | sanity                  |
-
-All data is hardcoded in `data/destinations.json`. No internet, no scraping,
-no Supabase.
+## Learning store
+JSON files live in `backend/data_store/`. Every `/analyze`, `/plan`,
+`/dream` call appends to `learned_itineraries.json`. `/feedback` writes
+to `feedback.json`. Future engine iterations re-weight on these signals.
