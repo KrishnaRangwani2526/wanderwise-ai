@@ -1,7 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
-import { Search, Loader2, ArrowRight, AlertTriangle, Lightbulb, Sparkles, MapPin } from "lucide-react";
+import { Search, Loader2, ArrowRight, AlertTriangle, Lightbulb, Sparkles } from "lucide-react";
 import { analyzeText, type AnalyzeResult } from "@/lib/engines/analyze";
+import { PageHero } from "@/components/PageHero";
 
 export const Route = createFileRoute("/analyze")({
   head: () => ({
@@ -47,31 +48,27 @@ function AnalyzePage() {
   }
 
   return (
-    <div className="bg-muted/30">
-      <section className="bg-ocean-grad px-4 py-12 text-white sm:py-16">
-        <div className="mx-auto max-w-5xl">
-          <span className="inline-flex items-center gap-2 rounded-full bg-white/20 px-3 py-1 text-xs font-semibold backdrop-blur">
-            <Search className="h-3.5 w-3.5" /> Analyze
-          </span>
-          <h1 className="mt-3 text-3xl font-black sm:text-5xl">Audit any plan in seconds</h1>
-          <p className="mt-2 max-w-2xl text-white/90">
-            Paste itinerary text, a blog excerpt, PDF copy or a reel caption. We extract the route,
-            budget, season fit and concrete improvements — all offline.
-          </p>
-        </div>
-      </section>
+    <div>
+      <PageHero
+        eyebrow="Step 02 · Analyze"
+        icon={<Search className="h-3.5 w-3.5" />}
+        title={<>Audit any plan, <span className="text-brand-gradient">in seconds.</span></>}
+        description="Paste itinerary text, a blog excerpt, PDF copy or a reel caption. We extract the route, budget, season fit and concrete improvements — all offline."
+      />
 
-      <section className="mx-auto -mt-6 max-w-5xl px-4">
-        <div className="shadow-card rounded-3xl border border-border bg-card p-5 sm:p-7">
+      <section className="mx-auto max-w-5xl px-4 py-8">
+        <div className="rounded-2xl border border-border bg-card p-5 shadow-soft sm:p-7">
           <div className="mb-3 flex flex-wrap items-center gap-2">
-            <label className="text-sm font-semibold">Source:</label>
+            <label className="text-sm font-semibold text-foreground">Source:</label>
             {(["text", "url", "pdf", "reel"] as const).map((s) => (
               <button
                 key={s}
                 type="button"
                 onClick={() => setSource(s)}
-                className={`rounded-full border px-3 py-1 text-xs font-semibold uppercase transition ${
-                  source === s ? "border-primary bg-primary text-primary-foreground" : "border-border bg-background hover:border-primary/50"
+                className={`rounded-full border px-3 py-1 text-xs font-semibold uppercase tracking-wider transition ${
+                  source === s
+                    ? "border-foreground bg-foreground text-background"
+                    : "border-border bg-background text-foreground hover:border-foreground/40"
                 }`}
               >
                 {s}
@@ -83,16 +80,16 @@ function AnalyzePage() {
             onChange={(e) => setText(e.target.value)}
             rows={7}
             placeholder="Paste itinerary text, a URL's content, or a reel caption…"
-            className="w-full rounded-xl border border-input bg-background p-3 text-sm focus:border-primary focus:outline-none"
+            className="w-full rounded-xl border border-input bg-background p-3 text-sm text-foreground focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20"
           />
           <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap items-center gap-2">
               <span className="text-xs text-muted-foreground">Try:</span>
               {SAMPLES.map((s) => (
                 <button
                   key={s.label}
                   onClick={() => { setText(s.text); run(s.text); }}
-                  className="rounded-full border border-border bg-background px-3 py-1 text-xs hover:border-primary/50"
+                  className="rounded-full border border-border bg-background px-3 py-1 text-xs font-medium hover:border-foreground/40"
                 >
                   {s.label}
                 </button>
@@ -101,7 +98,7 @@ function AnalyzePage() {
             <button
               onClick={() => run()}
               disabled={busy || !text.trim()}
-              className="inline-flex items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground shadow-soft hover:bg-primary/90 disabled:opacity-50"
+              className="inline-flex items-center gap-2 rounded-full bg-foreground px-5 py-2.5 text-sm font-semibold text-background transition hover:opacity-90 disabled:opacity-50"
             >
               {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
               Analyze
@@ -110,7 +107,7 @@ function AnalyzePage() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-7xl px-4 py-12">
+      <section className="mx-auto max-w-7xl px-4 pb-16">
         {result ? <Output r={result} /> : (
           <div className="rounded-2xl border border-dashed border-border bg-card/60 p-10 text-center text-sm text-muted-foreground">
             Paste any travel text above. Results appear here.
@@ -125,49 +122,89 @@ function Output({ r }: { r: AnalyzeResult }) {
   return (
     <div className="grid gap-6 lg:grid-cols-[1.4fr_1fr]">
       <div className="space-y-5">
-        <div className="shadow-card rounded-2xl bg-card p-5">
-          <h2 className="text-xl font-bold">Extracted route</h2>
+        {/* Summary table */}
+        <div className="overflow-hidden rounded-2xl border border-border bg-card">
+          <div className="border-b border-border bg-secondary/50 px-5 py-3">
+            <h2 className="font-display text-base font-semibold text-foreground">Extracted summary</h2>
+          </div>
+          <table className="w-full text-sm">
+            <tbody className="divide-y divide-border">
+              <SumRow label="Days detected" value={r.detected_days ?? "—"} />
+              <SumRow label="Travelers" value={r.detected_travelers ?? "—"} />
+              <SumRow label="Stated budget" value={r.detected_budget_inr ? `₹${r.detected_budget_inr.toLocaleString("en-IN")}` : "—"} />
+              <SumRow label="Best season" value={r.estimated_best_season ?? "—"} />
+              <SumRow label="Interests" value={r.detected_interests.join(", ") || "—"} />
+              <SumRow label="Destinations found" value={r.matched_destinations.length} />
+            </tbody>
+          </table>
+        </div>
+
+        {/* Route table */}
+        <div className="overflow-hidden rounded-2xl border border-border bg-card">
+          <div className="border-b border-border bg-secondary/50 px-5 py-3">
+            <h2 className="font-display text-base font-semibold text-foreground">Extracted route</h2>
+          </div>
           {r.matched_destinations.length === 0 ? (
-            <p className="mt-2 text-sm text-muted-foreground">
+            <p className="px-5 py-6 text-sm text-muted-foreground">
               We couldn't identify destinations. Try naming a city.
             </p>
           ) : (
-            <ol className="mt-3 space-y-2">
-              {r.matched_destinations.map((m, i) => (
-                <li key={m.destination.id} className="flex items-center gap-3 rounded-xl border border-border p-3">
-                  <span className="bg-sunset grid h-7 w-7 place-items-center rounded-full text-xs font-bold text-white">{i + 1}</span>
-                  <img src={m.destination.hero_image} alt="" className="h-12 w-16 rounded-md object-cover" />
-                  <div className="min-w-0 flex-1">
-                    <div className="font-semibold">{m.destination.name}</div>
-                    <div className="text-xs text-muted-foreground">{m.destination.state} · {m.destination.tagline}</div>
-                  </div>
-                  <Link to="/plan" search={{ dest: m.destination.id }} className="hidden text-xs font-semibold text-primary sm:inline-flex">
-                    Plan →
-                  </Link>
-                </li>
-              ))}
-            </ol>
+            <div className="overflow-x-auto">
+              <table className="min-w-full text-sm">
+                <thead className="bg-secondary/30 text-xs uppercase tracking-wider text-muted-foreground">
+                  <tr>
+                    <th className="px-4 py-3 text-left">#</th>
+                    <th className="px-4 py-3 text-left">Destination</th>
+                    <th className="px-4 py-3 text-left">State</th>
+                    <th className="px-4 py-3 text-left">Tagline</th>
+                    <th className="px-4 py-3" />
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-border">
+                  {r.matched_destinations.map((m, i) => (
+                    <tr key={m.destination.id} className="hover:bg-secondary/40">
+                      <td className="px-4 py-3 font-display font-bold text-foreground">{i + 1}</td>
+                      <td className="px-4 py-3">
+                        <div className="flex items-center gap-3">
+                          <img src={m.destination.hero_image} alt="" className="h-10 w-14 rounded-md object-cover" />
+                          <span className="font-semibold text-foreground">{m.destination.name}</span>
+                        </div>
+                      </td>
+                      <td className="px-4 py-3 text-muted-foreground">{m.destination.state}</td>
+                      <td className="px-4 py-3 text-muted-foreground">{m.destination.tagline}</td>
+                      <td className="px-4 py-3 text-right">
+                        <Link to="/plan" search={{ dest: m.destination.id }} className="text-xs font-semibold text-brand hover:underline">
+                          Plan →
+                        </Link>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           )}
         </div>
 
         {r.suggestions.length > 0 && (
-          <div className="rounded-2xl border border-accent/40 bg-accent/10 p-5">
-            <h3 className="flex items-center gap-2 font-bold"><Lightbulb className="h-4 w-4" /> Improvement suggestions</h3>
-            <ul className="mt-2 space-y-1.5 text-sm">
+          <div className="rounded-2xl border border-border bg-brand-soft p-5">
+            <h3 className="flex items-center gap-2 font-display font-bold text-foreground">
+              <Lightbulb className="h-4 w-4 text-brand" /> Improvement suggestions
+            </h3>
+            <ul className="mt-3 space-y-1.5 text-sm text-foreground/85">
               {r.suggestions.map((s) => <li key={s}>· {s}</li>)}
             </ul>
           </div>
         )}
 
         {r.must_add.length > 0 && (
-          <div className="shadow-card rounded-2xl bg-card p-5">
-            <h3 className="font-bold">Don't miss — nearby underrated picks</h3>
+          <div className="rounded-2xl border border-border bg-card p-5">
+            <h3 className="font-display font-bold text-foreground">Don't miss — nearby underrated picks</h3>
             <div className="mt-3 grid gap-3 sm:grid-cols-3">
               {r.must_add.map(({ destination: d, reason }) => (
-                <Link key={d.id} to="/plan" search={{ dest: d.id }} className="group overflow-hidden rounded-xl border border-border bg-background">
+                <Link key={d.id} to="/plan" search={{ dest: d.id }} className="group overflow-hidden rounded-xl border border-border bg-background transition hover:-translate-y-0.5 hover:shadow-card">
                   <img src={d.hero_image} alt={d.name} className="h-24 w-full object-cover transition group-hover:scale-105" />
                   <div className="p-3">
-                    <div className="text-sm font-bold">{d.name}</div>
+                    <div className="text-sm font-bold text-foreground">{d.name}</div>
                     <div className="text-[11px] text-muted-foreground">{reason}</div>
                   </div>
                 </Link>
@@ -178,18 +215,15 @@ function Output({ r }: { r: AnalyzeResult }) {
       </div>
 
       <aside className="space-y-4">
-        <div className="bg-spice-grad rounded-2xl p-5 text-white">
-          <div className="text-xs uppercase tracking-wider opacity-80">Estimated total cost</div>
-          <div className="text-3xl font-black">₹{r.estimated_total_cost_inr.toLocaleString("en-IN")}</div>
-          <div className="text-xs opacity-80">
+        <div className="rounded-2xl border border-border bg-card p-5 shadow-card">
+          <div className="text-xs uppercase tracking-wider text-muted-foreground">Estimated total cost</div>
+          <div className="mt-1 font-display text-3xl font-bold text-brand-gradient">
+            ₹{r.estimated_total_cost_inr.toLocaleString("en-IN")}
+          </div>
+          <div className="mt-1 text-xs text-muted-foreground">
             {r.detected_travelers ?? 2} travelers · {r.detected_days ?? 5} days
           </div>
         </div>
-        <Stat label="Best season" value={r.estimated_best_season ?? "—"} />
-        <Stat label="Detected days" value={r.detected_days ?? "not stated"} />
-        <Stat label="Detected travelers" value={r.detected_travelers ?? "not stated"} />
-        <Stat label="Stated budget" value={r.detected_budget_inr ? `₹${r.detected_budget_inr.toLocaleString("en-IN")}` : "—"} />
-        <Stat label="Interests" value={r.detected_interests.join(", ") || "—"} />
 
         {r.warnings.length > 0 && (
           <div className="rounded-xl border border-destructive/30 bg-destructive/10 p-3 text-xs text-destructive">
@@ -201,7 +235,7 @@ function Output({ r }: { r: AnalyzeResult }) {
           <Link
             to="/optimize"
             search={{ ids: r.matched_destinations.map((m) => m.destination.id).join(","), days: r.detected_days ?? 5, budget: r.detected_budget_inr ?? 0 }}
-            className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground"
+            className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-foreground px-4 py-2.5 text-sm font-semibold text-background hover:opacity-90"
           >
             Optimize this plan <ArrowRight className="h-4 w-4" />
           </Link>
@@ -211,11 +245,11 @@ function Output({ r }: { r: AnalyzeResult }) {
   );
 }
 
-function Stat({ label, value }: { label: string; value: React.ReactNode }) {
+function SumRow({ label, value }: { label: string; value: React.ReactNode }) {
   return (
-    <div className="rounded-xl border border-border bg-card p-3">
-      <div className="text-[10px] uppercase tracking-wider text-muted-foreground">{label}</div>
-      <div className="text-sm font-semibold">{value}</div>
-    </div>
+    <tr>
+      <td className="bg-secondary/20 px-4 py-2.5 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground w-[45%]">{label}</td>
+      <td className="px-4 py-2.5 text-sm font-medium text-foreground">{value}</td>
+    </tr>
   );
 }

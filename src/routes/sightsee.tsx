@@ -1,6 +1,8 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { useMemo, useState } from "react";
 import { DESTINATIONS } from "@/data/destinations";
-import { Camera } from "lucide-react";
+import { Camera, Search, ArrowRight } from "lucide-react";
+import { PageHero } from "@/components/PageHero";
 
 export const Route = createFileRoute("/sightsee")({
   head: () => ({
@@ -15,43 +17,75 @@ export const Route = createFileRoute("/sightsee")({
 });
 
 function SightseePage() {
+  const [q, setQ] = useState("");
+  const filtered = useMemo(() => {
+    const term = q.trim().toLowerCase();
+    if (!term) return DESTINATIONS;
+    return DESTINATIONS.filter(
+      (d) =>
+        d.name.toLowerCase().includes(term) ||
+        d.state.toLowerCase().includes(term) ||
+        d.tagline.toLowerCase().includes(term),
+    );
+  }, [q]);
+
   return (
-    <div className="bg-background">
-      <section className="border-b border-border bg-muted/30 px-4 py-14">
-        <div className="mx-auto max-w-5xl">
-          <span className="inline-flex items-center gap-2 rounded-full border border-border bg-white px-3 py-1 text-xs font-semibold text-foreground/70">
-            <Camera className="h-3.5 w-3.5 text-primary" /> Sightsee
-          </span>
-          <h1 className="mt-4 text-4xl font-semibold tracking-tight text-foreground sm:text-5xl">
-            A scenic India, in a single scroll
-          </h1>
-          <p className="mt-3 max-w-2xl text-muted-foreground">
-            Visual previews of every destination in our engine. Pick a vibe to spark your next trip.
-          </p>
+    <div>
+      <PageHero
+        eyebrow="Step 05 · Sightsee"
+        icon={<Camera className="h-3.5 w-3.5" />}
+        title={<>A scenic India, <span className="text-brand-gradient">in a single scroll.</span></>}
+        description="Visual previews of every destination in our engine. Pick a vibe to spark your next trip."
+      />
+
+      <section className="mx-auto max-w-5xl px-4 py-6">
+        <div className="relative">
+          <Search className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <input
+            value={q}
+            onChange={(e) => setQ(e.target.value)}
+            placeholder="Search destinations, states, vibes…"
+            className="w-full rounded-full border border-border bg-card py-3 pl-10 pr-4 text-sm shadow-soft focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20"
+          />
         </div>
+        <p className="mt-2 text-xs text-muted-foreground">{filtered.length} destinations</p>
       </section>
-      <section className="mx-auto max-w-7xl px-4 py-12">
+
+      <section className="mx-auto max-w-7xl px-4 py-6 pb-16">
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
-          {DESTINATIONS.map((d) => (
-            <figure
+          {filtered.map((d) => (
+            <Link
               key={d.id}
-              className="group relative overflow-hidden rounded-2xl shadow-soft transition hover:-translate-y-0.5 hover:shadow-card"
+              to="/plan"
+              search={{ dest: d.id }}
+              className="group relative overflow-hidden rounded-2xl border border-border bg-card shadow-soft transition hover:-translate-y-0.5 hover:shadow-card"
             >
-              <img
-                src={d.hero_image}
-                alt={d.name}
-                loading="lazy"
-                decoding="async"
-                className="aspect-[4/5] w-full object-cover transition duration-700 group-hover:scale-105"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
-              <figcaption className="glass absolute inset-x-3 bottom-3 rounded-xl p-3 shadow-glass">
-                <div className="text-sm font-semibold text-foreground">{d.name}</div>
-                <div className="text-[11px] text-muted-foreground">{d.state}</div>
+              <div className="relative aspect-[4/5] overflow-hidden">
+                <img
+                  src={d.hero_image}
+                  alt={d.name}
+                  loading="lazy"
+                  decoding="async"
+                  className="absolute inset-0 h-full w-full object-cover transition duration-700 group-hover:scale-105"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/0 to-transparent" />
+              </div>
+              <figcaption className="absolute inset-x-3 bottom-3 flex items-end justify-between gap-2 rounded-xl border border-white/30 bg-white/85 px-3 py-2 backdrop-blur">
+                <div className="min-w-0">
+                  <div className="truncate text-sm font-semibold text-foreground">{d.name}</div>
+                  <div className="text-[10px] uppercase tracking-wider text-muted-foreground">{d.state}</div>
+                </div>
+                <ArrowRight className="h-4 w-4 shrink-0 text-foreground/70 transition group-hover:translate-x-0.5 group-hover:text-brand" />
               </figcaption>
-            </figure>
+            </Link>
           ))}
         </div>
+
+        {filtered.length === 0 && (
+          <div className="rounded-2xl border border-dashed border-border bg-card/60 p-10 text-center text-sm text-muted-foreground">
+            No destinations match that search. Try a different term.
+          </div>
+        )}
       </section>
     </div>
   );
