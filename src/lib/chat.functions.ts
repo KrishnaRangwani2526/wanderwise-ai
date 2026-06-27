@@ -44,10 +44,10 @@ export const chat = createServerFn({ method: "POST" })
     try {
       const result = await generateText({
         model: gateway("google/gemini-3-flash-preview"),
-        messages: [
-          { role: "system", content: SYSTEM_PROMPT },
-          ...data.messages.map((m) => ({ role: m.role, content: m.content })),
-        ],
+        system: SYSTEM_PROMPT,
+        messages: data.messages
+          .filter((m) => m.role === "user" || m.role === "assistant")
+          .map((m) => ({ role: m.role as "user" | "assistant", content: m.content })),
       });
       return { text: result.text, error: false };
     } catch (e: unknown) {
