@@ -40,46 +40,49 @@
 }
 
 :root {
-  --radius: 0.875rem;
-  /* Warm professional — white surfaces, single amber/terracotta accent */
-  --background: oklch(0.995 0.004 80);
-  --foreground: oklch(0.18 0.02 50);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.18 0.02 50);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.18 0.02 50);
-  --primary: oklch(0.66 0.16 45);            /* warm terracotta */
-  --primary-foreground: oklch(0.99 0.005 80);
-  --secondary: oklch(0.97 0.012 70);
-  --secondary-foreground: oklch(0.22 0.02 50);
-  --muted: oklch(0.97 0.008 75);
-  --muted-foreground: oklch(0.48 0.02 60);
-  --accent: oklch(0.94 0.04 70);             /* sand */
-  --accent-foreground: oklch(0.22 0.02 50);
-  --destructive: oklch(0.58 0.24 27);
+  --radius: 0.5rem;
+  /* Editorial magazine — Condé Nast Traveler vibe.
+     navy #0B1F33 · cream #E8DCC4 · red #C9412E · off-white #F5F1EA */
+  --background: oklch(0.965 0.012 85);        /* off-white paper */
+  --foreground: oklch(0.22 0.04 255);         /* deep navy ink */
+  --card: oklch(0.99 0.006 85);
+  --card-foreground: oklch(0.22 0.04 255);
+  --popover: oklch(0.99 0.006 85);
+  --popover-foreground: oklch(0.22 0.04 255);
+  --primary: oklch(0.56 0.18 30);             /* editorial red */
+  --primary-foreground: oklch(0.985 0.008 85);
+  --secondary: oklch(0.89 0.04 85);           /* cream */
+  --secondary-foreground: oklch(0.22 0.04 255);
+  --muted: oklch(0.92 0.025 85);
+  --muted-foreground: oklch(0.42 0.03 250);
+  --accent: oklch(0.89 0.04 85);              /* cream */
+  --accent-foreground: oklch(0.22 0.04 255);
+  --destructive: oklch(0.56 0.22 27);
   --destructive-foreground: oklch(0.99 0 0);
-  --border: oklch(0.92 0.01 70);
-  --input: oklch(0.94 0.01 70);
-  --ring: oklch(0.66 0.16 45);
+  --border: oklch(0.82 0.025 85);
+  --input: oklch(0.86 0.022 85);
+  --ring: oklch(0.56 0.18 30);
 
-  /* Legacy palette tokens kept so existing components still resolve, but unified to warm tones */
+  /* Editorial supporting tokens (and legacy aliases so older utilities still resolve) */
+  --ink: oklch(0.22 0.04 255);
+  --cream: oklch(0.89 0.04 85);
+  --paper: oklch(0.965 0.012 85);
   --sunset: var(--primary);
-  --ocean: oklch(0.58 0.04 60);
-  --jungle: oklch(0.55 0.05 70);
-  --spice: oklch(0.62 0.14 35);
-  --sand: oklch(0.94 0.04 70);
+  --ocean: oklch(0.32 0.05 250);
+  --jungle: oklch(0.42 0.06 145);
+  --spice: var(--primary);
+  --sand: var(--cream);
 
-  /* Unified warm gradient (used by hero + legacy bg-* utilities) */
-  --gradient-warm: linear-gradient(135deg, oklch(0.72 0.13 55) 0%, oklch(0.62 0.17 35) 100%);
+  --gradient-warm: linear-gradient(135deg, oklch(0.65 0.18 35) 0%, oklch(0.45 0.16 25) 100%);
   --gradient-sunset: var(--gradient-warm);
-  --gradient-ocean: var(--gradient-warm);
+  --gradient-ocean: linear-gradient(135deg, oklch(0.32 0.05 250) 0%, oklch(0.22 0.04 255) 100%);
   --gradient-jungle: var(--gradient-warm);
   --gradient-spice: var(--gradient-warm);
-  --gradient-hero: linear-gradient(135deg, oklch(0.78 0.08 70) 0%, oklch(0.68 0.14 45) 60%, oklch(0.6 0.16 30) 100%);
+  --gradient-hero: linear-gradient(180deg, oklch(0.965 0.012 85) 0%, oklch(0.89 0.04 85) 100%);
 
-  --shadow-soft: 0 6px 18px -10px oklch(0.3 0.04 40 / 18%);
-  --shadow-card: 0 10px 30px -16px oklch(0.3 0.04 40 / 22%);
-  --shadow-glass: 0 8px 32px -10px oklch(0.3 0.04 40 / 18%);
+  --shadow-soft: 0 6px 18px -12px oklch(0.22 0.04 255 / 20%);
+  --shadow-card: 0 14px 36px -18px oklch(0.22 0.04 255 / 28%);
+  --shadow-glass: 0 8px 32px -10px oklch(0.22 0.04 255 / 18%);
 }
 
 .dark {
