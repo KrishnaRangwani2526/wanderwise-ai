@@ -30,79 +30,71 @@
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
-  --color-sunset: var(--sunset);
-  --color-ocean: var(--ocean);
-  --color-jungle: var(--jungle);
-  --color-spice: var(--spice);
-  --color-sand: var(--sand);
-  --font-display: "Fraunces", "Playfair Display", Georgia, serif;
+  --color-brand: var(--brand);
+  --color-brand-soft: var(--brand-soft);
+  --color-accent2: var(--accent2);
+  --font-display: "Plus Jakarta Sans", "Inter", system-ui, sans-serif;
   --font-sans: "Inter", system-ui, sans-serif;
 }
 
 :root {
-  --radius: 0.5rem;
-  /* Editorial magazine — Condé Nast Traveler vibe.
-     navy #0B1F33 · cream #E8DCC4 · red #C9412E · off-white #F5F1EA */
-  --background: oklch(0.965 0.012 85);        /* off-white paper */
-  --foreground: oklch(0.22 0.04 255);         /* deep navy ink */
-  --card: oklch(0.99 0.006 85);
-  --card-foreground: oklch(0.22 0.04 255);
-  --popover: oklch(0.99 0.006 85);
-  --popover-foreground: oklch(0.22 0.04 255);
-  --primary: oklch(0.56 0.18 30);             /* editorial red */
-  --primary-foreground: oklch(0.985 0.008 85);
-  --secondary: oklch(0.89 0.04 85);           /* cream */
-  --secondary-foreground: oklch(0.22 0.04 255);
-  --muted: oklch(0.92 0.025 85);
-  --muted-foreground: oklch(0.42 0.03 250);
-  --accent: oklch(0.89 0.04 85);              /* cream */
-  --accent-foreground: oklch(0.22 0.04 255);
-  --destructive: oklch(0.56 0.22 27);
-  --destructive-foreground: oklch(0.99 0 0);
-  --border: oklch(0.82 0.025 85);
-  --input: oklch(0.86 0.022 85);
-  --ring: oklch(0.56 0.18 30);
+  --radius: 0.75rem;
+  /* Clean white minimalist — travel palette
+     Single brand gradient: teal → indigo → coral, used sparingly */
+  --background: oklch(1 0 0);                 /* pure white */
+  --foreground: oklch(0.18 0.02 250);         /* deep slate ink */
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.18 0.02 250);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.18 0.02 250);
 
-  /* Editorial supporting tokens (and legacy aliases so older utilities still resolve) */
-  --ink: oklch(0.22 0.04 255);
-  --cream: oklch(0.89 0.04 85);
-  --paper: oklch(0.965 0.012 85);
-  --sunset: var(--primary);
-  --ocean: oklch(0.32 0.05 250);
-  --jungle: oklch(0.42 0.06 145);
-  --spice: var(--primary);
-  --sand: var(--cream);
+  --primary: oklch(0.55 0.13 200);            /* teal */
+  --primary-foreground: oklch(1 0 0);
+  --secondary: oklch(0.975 0.005 240);        /* soft gray surface */
+  --secondary-foreground: oklch(0.22 0.02 250);
+  --muted: oklch(0.97 0.005 240);
+  --muted-foreground: oklch(0.5 0.01 245);
+  --accent: oklch(0.96 0.018 220);
+  --accent-foreground: oklch(0.22 0.02 250);
+  --destructive: oklch(0.6 0.21 27);
+  --destructive-foreground: oklch(1 0 0);
+  --border: oklch(0.92 0.005 240);
+  --input: oklch(0.92 0.005 240);
+  --ring: oklch(0.55 0.13 200);
 
-  --gradient-warm: linear-gradient(135deg, oklch(0.65 0.18 35) 0%, oklch(0.45 0.16 25) 100%);
-  --gradient-sunset: var(--gradient-warm);
-  --gradient-ocean: linear-gradient(135deg, oklch(0.32 0.05 250) 0%, oklch(0.22 0.04 255) 100%);
-  --gradient-jungle: var(--gradient-warm);
-  --gradient-spice: var(--gradient-warm);
-  --gradient-hero: linear-gradient(180deg, oklch(0.965 0.012 85) 0%, oklch(0.89 0.04 85) 100%);
+  --brand: oklch(0.55 0.13 200);              /* teal */
+  --brand-soft: oklch(0.96 0.02 200);
+  --accent2: oklch(0.62 0.18 25);             /* coral */
 
-  --shadow-soft: 0 6px 18px -12px oklch(0.22 0.04 255 / 20%);
-  --shadow-card: 0 14px 36px -18px oklch(0.22 0.04 255 / 28%);
-  --shadow-glass: 0 8px 32px -10px oklch(0.22 0.04 255 / 18%);
+  /* Single signature gradient (used sparingly: hero word, primary CTA, accent rule) */
+  --gradient-brand: linear-gradient(120deg, oklch(0.6 0.14 200) 0%, oklch(0.55 0.16 270) 50%, oklch(0.65 0.18 25) 100%);
+  --gradient-brand-soft: linear-gradient(120deg, oklch(0.97 0.03 200) 0%, oklch(0.97 0.03 270) 50%, oklch(0.97 0.03 25) 100%);
+  --gradient-hero: radial-gradient(1200px 600px at 80% -10%, oklch(0.95 0.05 200 / 60%), transparent 60%),
+                   radial-gradient(900px 500px at -10% 10%, oklch(0.96 0.04 25 / 50%), transparent 60%);
+
+  --shadow-soft: 0 1px 2px oklch(0.18 0.02 250 / 4%), 0 4px 16px -8px oklch(0.18 0.02 250 / 8%);
+  --shadow-card: 0 2px 4px oklch(0.18 0.02 250 / 4%), 0 12px 32px -12px oklch(0.18 0.02 250 / 12%);
+  --shadow-glow: 0 0 0 1px oklch(0.55 0.13 200 / 18%), 0 16px 48px -16px oklch(0.55 0.13 200 / 30%);
 }
 
 .dark {
-  --background: oklch(0.18 0.02 60);
-  --foreground: oklch(0.97 0.01 80);
-  --card: oklch(0.22 0.02 60);
-  --card-foreground: oklch(0.97 0.01 80);
-  --popover: oklch(0.22 0.02 60);
-  --popover-foreground: oklch(0.97 0.01 80);
-  --primary: oklch(0.72 0.16 45);
-  --primary-foreground: oklch(0.15 0.02 60);
-  --secondary: oklch(0.28 0.02 60);
-  --secondary-foreground: oklch(0.97 0.01 80);
-  --muted: oklch(0.28 0.02 60);
-  --muted-foreground: oklch(0.75 0.02 80);
-  --accent: oklch(0.3 0.03 60);
-  --accent-foreground: oklch(0.97 0.01 80);
+  --background: oklch(0.16 0.015 250);
+  --foreground: oklch(0.97 0.005 240);
+  --card: oklch(0.2 0.015 250);
+  --card-foreground: oklch(0.97 0.005 240);
+  --popover: oklch(0.2 0.015 250);
+  --popover-foreground: oklch(0.97 0.005 240);
+  --primary: oklch(0.72 0.13 200);
+  --primary-foreground: oklch(0.15 0.02 250);
+  --secondary: oklch(0.24 0.015 250);
+  --secondary-foreground: oklch(0.97 0.005 240);
+  --muted: oklch(0.24 0.015 250);
+  --muted-foreground: oklch(0.7 0.01 245);
+  --accent: oklch(0.26 0.02 220);
+  --accent-foreground: oklch(0.97 0.005 240);
   --border: oklch(1 0 0 / 10%);
   --input: oklch(1 0 0 / 12%);
-  --ring: oklch(0.72 0.16 45);
+  --ring: oklch(0.72 0.13 200);
 }
 
 @layer base {
@@ -115,43 +107,50 @@
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
   }
-  h1, h2, h3 {
+  h1, h2, h3, h4 {
     font-family: var(--font-display);
     letter-spacing: -0.02em;
   }
 }
 
+/* Brand gradient utilities (single signature gradient) */
+@utility bg-brand {
+  background-image: var(--gradient-brand);
+}
+@utility bg-brand-soft {
+  background-image: var(--gradient-brand-soft);
+}
 @utility bg-hero {
   background-image: var(--gradient-hero);
 }
-@utility bg-sunset { background-image: var(--gradient-warm); }
-@utility bg-ocean-grad { background-image: var(--gradient-warm); }
-@utility bg-jungle-grad { background-image: var(--gradient-warm); }
-@utility bg-spice-grad { background-image: var(--gradient-warm); }
+@utility text-brand-gradient {
+  background-image: var(--gradient-brand);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+@utility ring-brand {
+  box-shadow: var(--shadow-glow);
+}
 @utility shadow-soft { box-shadow: var(--shadow-soft); }
 @utility shadow-card { box-shadow: var(--shadow-card); }
-@utility shadow-glass { box-shadow: var(--shadow-glass); }
 
-/* Glassmorphism — frosted card over imagery */
+/* Legacy aliases (older route files still use these — map them to clean tokens) */
+@utility bg-sunset { background-image: var(--gradient-brand); }
+@utility bg-ocean-grad { background-image: var(--gradient-brand); }
+@utility bg-jungle-grad { background-image: var(--gradient-brand); }
+@utility bg-spice-grad { background-image: var(--gradient-brand); }
+@utility bg-jungle { background-image: var(--gradient-brand); }
+@utility shadow-glass { box-shadow: var(--shadow-soft); }
 @utility glass {
-  background: color-mix(in oklch, white 55%, transparent);
-  backdrop-filter: blur(18px) saturate(140%);
-  border: 1px solid color-mix(in oklch, white 60%, transparent);
-}
-@utility glass-strong {
-  background: color-mix(in oklch, white 72%, transparent);
-  backdrop-filter: blur(22px) saturate(160%);
-  border: 1px solid color-mix(in oklch, white 70%, transparent);
-}
-@utility glass-dark {
-  background: color-mix(in oklch, black 28%, transparent);
+  background: color-mix(in oklch, white 80%, transparent);
   backdrop-filter: blur(14px) saturate(140%);
-  border: 1px solid color-mix(in oklch, white 18%, transparent);
+  border: 1px solid color-mix(in oklch, white 60%, transparent);
 }
 
 @keyframes float-slow {
   0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-8px); }
+  50% { transform: translateY(-6px); }
 }
 @utility animate-float {
   animation: float-slow 7s ease-in-out infinite;
@@ -166,10 +165,9 @@
   to { transform: translateX(-50%); }
 }
 @utility animate-marquee {
-  animation: marquee 50s linear infinite;
+  animation: marquee 55s linear infinite;
 }
 
-/* Respect reduced motion for smoother experience */
 @media (prefers-reduced-motion: reduce) {
   .animate-float, .animate-marquee { animation: none !important; }
 }
