@@ -2,7 +2,11 @@
   "name": "wanderwise-ai-root",
   "private": true,
   "scripts": {
-    "dev": "powershell ./start-all.ps1",
-    "install-all": "cd frontend && npm install && cd ../backend && echo 'Backend ready'"
+    "dev": "cd frontend && vite dev",
+    "build": "cd frontend && vite build",
+    "build:dev": "cd frontend && vite build --mode development",
+    "preview": "cd frontend && vite preview",
+    "lint": "cd frontend && eslint .",
+    "typecheck": "cd frontend && tsgo --noEmit"
   }
 }
