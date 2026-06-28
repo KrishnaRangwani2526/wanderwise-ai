@@ -1,10 +1,9 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { useMutation } from "@tanstack/react-query";
-import { useServerFn } from "@tanstack/react-start";
 import { CalendarDays, Loader2, MapPin, Sparkles, Trophy, Users, Wallet } from "lucide-react";
 import { DESTINATIONS } from "@/data/destinations";
-import { planTrip, type PlanRequest } from "@/lib/plan.functions";
+import { api } from "@/lib/api";
 import { PageHero } from "@/components/PageHero";
 
 export const Route = createFileRoute("/plan")({
@@ -32,13 +31,12 @@ const inputCls = "w-full rounded-lg border border-input bg-background px-3 py-2 
 
 function PlanPage() {
   const { dest: destFromSearch } = Route.useSearch();
-  const planFn = useServerFn(planTrip);
 
   const [destId, setDestId] = useState(destFromSearch ?? DESTINATIONS[0].id);
   const [startDate, setStartDate] = useState("");
   const [days, setDays] = useState(5);
   const [travelers, setTravelers] = useState(2);
-  const [style, setStyle] = useState<PlanRequest["style"]>("mid");
+  const [style, setStyle] = useState<string>("mid");
   const [budget, setBudget] = useState(0);
   const [likes, setLikes] = useState("food, scenic views");
   const [dislikes, setDislikes] = useState("crowds");
@@ -47,7 +45,7 @@ function PlanPage() {
   const dest = useMemo(() => DESTINATIONS.find((d) => d.id === destId)!, [destId]);
 
   const mutation = useMutation({
-    mutationFn: async (req: PlanRequest) => planFn({ data: req }),
+    mutationFn: async (req: any) => api.plan(req),
   });
 
   function onSubmit(e: React.FormEvent) {
@@ -100,7 +98,7 @@ function PlanPage() {
               <input type="range" min={1} max={10} value={travelers} onChange={(e) => setTravelers(+e.target.value)} className="w-full accent-[var(--brand)]" />
             </Field>
             <Field label="Travel style">
-              <select value={style} onChange={(e) => setStyle(e.target.value as PlanRequest["style"])} className={inputCls}>
+              <select value={style} onChange={(e) => setStyle(e.target.value)} className={inputCls}>
                 <option value="shoestring">Shoestring</option>
                 <option value="budget">Budget</option>
                 <option value="mid">Mid</option>
@@ -178,7 +176,7 @@ function PlanPage() {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-border">
-                    {mutation.data.options.map((opt) => (
+                    {mutation.data.options.map((opt: any) => (
                       <tr key={opt.variant} className={opt.ranked.rank === 1 ? "bg-brand-soft/50" : "hover:bg-secondary/40"}>
                         <td className="px-4 py-3 font-display font-bold text-foreground">#{opt.ranked.rank}</td>
                         <td className="px-4 py-3 font-semibold text-foreground">{opt.label}</td>
@@ -194,8 +192,10 @@ function PlanPage() {
               </div>
             </div>
 
+            <AiTips destination={mutation.data.destination.name} />
+
             <div className="grid gap-6 lg:grid-cols-3">
-              {mutation.data.options.map((opt) => (
+              {mutation.data.options.map((opt: any) => (
                 <article
                   key={opt.variant}
                   className={`rounded-2xl border bg-card p-5 shadow-soft ${
@@ -224,7 +224,7 @@ function PlanPage() {
                   </div>
 
                   <ol className="mt-4 space-y-2">
-                    {opt.days.map((day) => (
+                    {opt.days.map((day: any) => (
                       <li key={day.day} className="rounded-xl border border-border bg-secondary/30 p-3">
                         <div className="mb-1 flex items-baseline justify-between gap-2">
                           <p className="text-sm font-bold text-foreground">Day {day.day} · {day.title}</p>
@@ -241,7 +241,7 @@ function PlanPage() {
                   <div className="mt-4 rounded-xl border border-border bg-brand-soft p-3">
                     <p className="text-xs font-semibold text-foreground">Why this rank — {opt.ranked.verdict}</p>
                     <ul className="mt-1 space-y-0.5 text-xs text-foreground/80">
-                      {opt.reasons.map((r, i) => (<li key={i}>• {r}</li>))}
+                      {opt.reasons.map((r: any, i: number) => (<li key={i}>• {r}</li>))}
                     </ul>
                   </div>
 
@@ -265,6 +265,45 @@ function PlanPage() {
           </div>
         )}
       </section>
+    </div>
+  );
+}
+
+function AiTips({ destination }: { destination: string }) {
+  const [tips, setTips] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    setLoading(true);
+    api.ai.planEnhance({ destination })
+      .then(res => setTips(res.text))
+      .catch(() => setTips("Unable to load AI tips."))
+      .finally(() => setLoading(false));
+  }, [destination]);
+
+  return (
+    <div className="mb-8 rounded-2xl border border-indigo-100 bg-indigo-50/30 p-6">
+      <div className="mb-4 flex items-center gap-2">
+        <Sparkles className="h-5 w-5 text-indigo-600" />
+        <h3 className="font-display text-lg font-bold text-indigo-900">AI Local Tips & Insights</h3>
+      </div>
+      {loading ? (
+        <div className="flex items-center gap-2 text-sm text-indigo-600/70">
+          <Loader2 className="h-4 w-4 animate-spin" /> Gathering local wisdom...
+        </div>
+      ) : (
+        <div className="prose prose-sm prose-indigo max-w-none text-indigo-900/80">
+          {tips ? (
+            <div className="grid gap-4 md:grid-cols-2">
+              <div className="markdown-content">
+                {tips.split('\n').map((line, i) => (
+                  <p key={i} className={line.startsWith('#') ? 'font-bold mt-2' : ''}>{line}</p>
+                ))}
+              </div>
+            </div>
+          ) : "No tips available."}
+        </div>
+      )}
     </div>
   );
 }

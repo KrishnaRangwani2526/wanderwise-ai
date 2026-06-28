@@ -1,15 +1,15 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useMutation } from "@tanstack/react-query";
-import { useServerFn } from "@tanstack/react-start";
 import { Sparkles, Loader2, MapPin, Star, ArrowRight } from "lucide-react";
 import {
   INTEREST_LABELS,
   SEASON_LABELS,
+  DESTINATIONS,
   type Interest,
   type Season,
 } from "@/data/destinations";
-import { dreamDestinations, type DreamRequest, type DreamResultItem } from "@/lib/dream.functions";
+import { api } from "@/lib/api";
 import { PageHero } from "@/components/PageHero";
 
 export const Route = createFileRoute("/dream")({
@@ -34,18 +34,41 @@ export const Route = createFileRoute("/dream")({
 const INTERESTS = Object.keys(INTEREST_LABELS) as Interest[];
 const SEASONS = Object.keys(SEASON_LABELS) as Season[];
 
+const getHeroImage = (id: string) => {
+  const dest = DESTINATIONS.find(d => d.id === id);
+  return dest?.hero_image || "";
+};
+
+interface DreamResultItem {
+  id: string;
+  name: string;
+  state: string;
+  tagline: string;
+  interests: Interest[];
+  best_seasons: Season[];
+  score: number;
+  reasons: string[];
+  estimated_cost_inr: number;
+  per_person_per_day_inr: number;
+  hero_image: string;
+  ranked: {
+    rank: number;
+    total_score: number;
+    verdict: string;
+  };
+}
+
 function DreamPage() {
-  const dreamFn = useServerFn(dreamDestinations);
   const [interests, setInterests] = useState<Interest[]>(["mountains"]);
   const [seasons, setSeasons] = useState<Season[]>([]);
   const [days, setDays] = useState(5);
   const [travelers, setTravelers] = useState(2);
   const [maxBudget, setMaxBudget] = useState(0);
   const [avoidCrowds, setAvoidCrowds] = useState(false);
-  const [style, setStyle] = useState<DreamRequest["style"]>("mid");
+  const [style, setStyle] = useState<string>("mid");
 
   const mutation = useMutation({
-    mutationFn: async (req: DreamRequest) => dreamFn({ data: req }),
+    mutationFn: async (req: any) => api.dream(req),
   });
 
   const toggle = <T extends string>(arr: T[], v: T, set: (a: T[]) => void) => {
@@ -107,7 +130,7 @@ function DreamPage() {
             <Field label="Travel style">
               <select
                 value={style}
-                onChange={(e) => setStyle(e.target.value as DreamRequest["style"])}
+                onChange={(e) => setStyle(e.target.value)}
                 className={selectCls}
               >
                 <option value="shoestring">Shoestring</option>
@@ -210,7 +233,21 @@ function Results({ results }: { results: DreamResultItem[] }) {
   if (results.length === 0) {
     return <p className="text-center text-muted-foreground">No matches. Try widening your filters.</p>;
   }
-  const [top, ...rest] = results;
+  const resultsWithImages = results.map(r => ({ ...r, hero_image: getHeroImage(r.id) }));
+  const [top, ...rest] = resultsWithImages;
+
+  const [aiInsight, setAiInsight] = useState<string | null>(null);
+  const [loadingAi, setLoadingAi] = useState(false);
+
+  useEffect(() => {
+    setAiInsight(null);
+    setLoadingAi(true);
+    api.ai.dreamEnhance({ name: top.name, interests: top.interests })
+      .then(res => setAiInsight(res.text))
+      .catch(() => setAiInsight("Unable to load AI insight at this time."))
+      .finally(() => setLoadingAi(false));
+  }, [top.id]);
+
   return (
     <div>
       <div className="mb-6 flex items-baseline justify-between">
@@ -236,7 +273,23 @@ function Results({ results }: { results: DreamResultItem[] }) {
           <p className="mt-3 rounded-lg border border-border bg-brand-soft p-3 text-sm font-medium text-foreground">
             ✨ {top.ranked.verdict}
           </p>
-          <ul className="mt-3 space-y-1 text-sm text-foreground/80">
+          
+          {loadingAi ? (
+            <div className="mt-4 flex items-center gap-2 text-xs text-muted-foreground">
+              <Loader2 className="h-3.3 animate-spin" /> Curating AI insights...
+            </div>
+          ) : aiInsight && (
+            <div className="mt-4 rounded-xl border border-dashed border-indigo-200 bg-indigo-50/50 p-4">
+              <div className="mb-1 flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-indigo-700">
+                <Sparkles className="h-3 w-3" /> AI Perspective
+              </div>
+              <p className="text-sm italic text-indigo-900/80 leading-relaxed">
+                "{aiInsight}"
+              </p>
+            </div>
+          )}
+
+          <ul className="mt-4 space-y-1 text-sm text-foreground/80">
             {top.reasons.map((r) => (
               <li key={r}>· {r}</li>
             ))}

@@ -8,7 +8,7 @@ import {
   Scripts,
 } from "@tanstack/react-router";
 import { useEffect, useState, type ReactNode } from "react";
-import { Menu, X, Compass, ArrowUpRight } from "lucide-react";
+import { Menu, X, Compass, ArrowUpRight, Moon, Sun } from "lucide-react";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
@@ -135,6 +135,44 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function SiteHeader() {
   const [open, setOpen] = useState(false);
+  const [user, setUser] = useState<{ name: string; email: string } | null>(null);
+  const [isDark, setIsDark] = useState(false);
+
+  useEffect(() => {
+    const saved = localStorage.getItem("wc.user");
+    if (saved) setUser(JSON.parse(saved));
+    
+    // Theme
+    const theme = localStorage.getItem("wc.theme");
+    if (theme === "dark" || (!theme && window.matchMedia("(prefers-color-scheme: dark)").matches)) {
+      setIsDark(true);
+      document.documentElement.classList.add("dark");
+    }
+  }, []);
+
+  const toggleTheme = () => {
+    const newDark = !isDark;
+    setIsDark(newDark);
+    if (newDark) {
+      document.documentElement.classList.add("dark");
+      localStorage.setItem("wc.theme", "dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+      localStorage.setItem("wc.theme", "light");
+    }
+  };
+
+  const login = () => {
+    const mock = { name: "Traveler", email: "hello@wanderwise.ai" };
+    setUser(mock);
+    localStorage.setItem("wc.user", JSON.stringify(mock));
+  };
+
+  const logout = () => {
+    setUser(null);
+    localStorage.removeItem("wc.user");
+  };
+
   return (
     <header className="sticky top-0 z-40 border-b border-border bg-background/85 backdrop-blur-md">
       <div className="mx-auto grid max-w-7xl grid-cols-[minmax(0,1fr)_auto] items-center gap-4 px-4 py-3 sm:py-4 md:flex md:justify-between">
@@ -164,7 +202,33 @@ function SiteHeader() {
           ))}
         </nav>
 
-        <div className="hidden md:block">
+        <div className="hidden items-center gap-4 md:flex">
+          <button
+            onClick={toggleTheme}
+            className="flex h-9 w-9 items-center justify-center rounded-lg border border-border text-foreground hover:bg-secondary transition-colors"
+            aria-label="Toggle theme"
+          >
+            {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+          </button>
+          
+          {user ? (
+            <div className="flex items-center gap-3">
+              <div className="flex flex-col items-end">
+                <span className="text-xs font-bold text-foreground">{user.name}</span>
+                <button onClick={logout} className="text-[10px] font-semibold text-muted-foreground hover:text-foreground">Logout</button>
+              </div>
+              <div className="h-8 w-8 rounded-full bg-brand text-background grid place-items-center font-bold text-xs shadow-soft">
+                {user.name[0]}
+              </div>
+            </div>
+          ) : (
+            <button
+              onClick={login}
+              className="text-sm font-semibold text-foreground/80 hover:text-foreground"
+            >
+              Log in
+            </button>
+          )}
           <Link
             to="/dream"
             className="inline-flex items-center gap-1.5 rounded-full bg-foreground px-4 py-2 text-[12.5px] font-semibold text-background transition hover:opacity-90"

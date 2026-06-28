@@ -29,32 +29,17 @@ export const chat = createServerFn({ method: "POST" })
     return data;
   })
   .handler(async ({ data }) => {
-    const apiKey = process.env.LOVABLE_API_KEY;
-    if (!apiKey) {
-      return { text: "AI is not configured (missing LOVABLE_API_KEY).", error: true };
-    }
-    const gateway = createOpenAICompatible({
-      name: "lovable",
-      baseURL: "https://ai.gateway.lovable.dev/v1",
-      headers: {
-        "Lovable-API-Key": apiKey,
-        "X-Lovable-AIG-SDK": "vercel-ai-sdk",
-      },
-    });
     try {
-      const result = await generateText({
-        model: gateway("google/gemini-3-flash-preview"),
-        system: SYSTEM_PROMPT,
-        messages: data.messages
-          .filter((m) => m.role === "user" || m.role === "assistant")
-          .map((m) => ({ role: m.role as "user" | "assistant", content: m.content })),
+      const res = await fetch("http://localhost:8000/ai/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ messages: data.messages }),
       });
-      return { text: result.text, error: false };
+      if (!res.ok) throw new Error(`Backend error: ${res.status}`);
+      const json = await res.json();
+      return { text: json.text, error: false };
     } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : "AI request failed";
-      // Surface 429 / 402 plainly
-      if (/429|rate/i.test(msg)) return { text: "Rate limited — try again in a few seconds.", error: true };
-      if (/402|credit|payment/i.test(msg)) return { text: "AI credits exhausted — add credits in workspace settings.", error: true };
-      return { text: `AI error: ${msg}`, error: true };
+      return { text: `AI backend error: ${msg}. Make sure your local engine is running.`, error: true };
     }
   });

@@ -31,20 +31,34 @@ const SAMPLES: { label: string; text: string }[] = [
   },
 ];
 
+import { api } from "@/lib/api";
+
 function AnalyzePage() {
   const [text, setText] = useState("");
   const [source, setSource] = useState("text");
   const [busy, setBusy] = useState(false);
-  const [result, setResult] = useState<AnalyzeResult | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [result, setResult] = useState<any>(null);
 
-  function run(payload?: string) {
+  async function run(payload?: string) {
     const t = payload ?? text;
     if (!t.trim()) return;
     setBusy(true);
-    setTimeout(() => {
-      setResult(analyzeText({ text: t, source_label: source }));
+    setError(null);
+    try {
+      const res = await api.analyze({ text: source !== 'url' ? t : '', url: source === 'url' ? t : undefined });
+      if (res.error) {
+        setError(res.error);
+        setResult(null);
+      } else {
+        setResult(res);
+      }
+    } catch (e) {
+      setError("Unable to connect to the analysis engine. Make sure the local backend is running.");
+      setResult(null);
+    } finally {
       setBusy(false);
-    }, 250);
+    }
   }
 
   return (
@@ -108,6 +122,11 @@ function AnalyzePage() {
       </section>
 
       <section className="mx-auto max-w-7xl px-4 pb-16">
+        {error && (
+          <div className="mb-8 rounded-xl border border-destructive/30 bg-destructive/10 p-5 text-sm text-destructive">
+            <AlertTriangle className="mr-2 inline h-4 w-4" /> {error}
+          </div>
+        )}
         {result ? <Output r={result} /> : (
           <div className="rounded-2xl border border-dashed border-border bg-card/60 p-10 text-center text-sm text-muted-foreground">
             Paste any travel text above. Results appear here.
@@ -118,10 +137,20 @@ function AnalyzePage() {
   );
 }
 
-function Output({ r }: { r: AnalyzeResult }) {
+function Output({ r }: { r: any }) {
   return (
     <div className="grid gap-6 lg:grid-cols-[1.4fr_1fr]">
       <div className="space-y-5">
+        {r.ai_summary && (
+          <div className="rounded-2xl border border-indigo-100 bg-indigo-50 p-5 shadow-soft">
+            <h3 className="mb-2 flex items-center gap-2 font-display text-sm font-bold text-indigo-900">
+              <Sparkles className="h-4 w-4 text-indigo-600" /> AI Itinerary Breakdown
+            </h3>
+            <p className="text-sm italic leading-relaxed text-indigo-900/80">
+              {r.ai_summary}
+            </p>
+          </div>
+        )}
         {/* Summary table */}
         <div className="overflow-hidden rounded-2xl border border-border bg-card">
           <div className="border-b border-border bg-secondary/50 px-5 py-3">
@@ -161,7 +190,7 @@ function Output({ r }: { r: AnalyzeResult }) {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border">
-                  {r.matched_destinations.map((m, i) => (
+                  {r.matched_destinations.map((m: any, i: number) => (
                     <tr key={m.destination.id} className="hover:bg-secondary/40">
                       <td className="px-4 py-3 font-display font-bold text-foreground">{i + 1}</td>
                       <td className="px-4 py-3">
@@ -185,22 +214,22 @@ function Output({ r }: { r: AnalyzeResult }) {
           )}
         </div>
 
-        {r.suggestions.length > 0 && (
+        {r.suggestions && r.suggestions.length > 0 && (
           <div className="rounded-2xl border border-border bg-brand-soft p-5">
             <h3 className="flex items-center gap-2 font-display font-bold text-foreground">
               <Lightbulb className="h-4 w-4 text-brand" /> Improvement suggestions
             </h3>
             <ul className="mt-3 space-y-1.5 text-sm text-foreground/85">
-              {r.suggestions.map((s) => <li key={s}>· {s}</li>)}
+              {r.suggestions.map((s: any) => <li key={s}>· {s}</li>)}
             </ul>
           </div>
         )}
 
-        {r.must_add.length > 0 && (
+        {r.must_add && r.must_add.length > 0 && (
           <div className="rounded-2xl border border-border bg-card p-5">
             <h3 className="font-display font-bold text-foreground">Don't miss — nearby underrated picks</h3>
             <div className="mt-3 grid gap-3 sm:grid-cols-3">
-              {r.must_add.map(({ destination: d, reason }) => (
+              {r.must_add.map(({ destination: d, reason }: any) => (
                 <Link key={d.id} to="/plan" search={{ dest: d.id }} className="group overflow-hidden rounded-xl border border-border bg-background transition hover:-translate-y-0.5 hover:shadow-card">
                   <img src={d.hero_image} alt={d.name} className="h-24 w-full object-cover transition group-hover:scale-105" />
                   <div className="p-3">
@@ -218,23 +247,23 @@ function Output({ r }: { r: AnalyzeResult }) {
         <div className="rounded-2xl border border-border bg-card p-5 shadow-card">
           <div className="text-xs uppercase tracking-wider text-muted-foreground">Estimated total cost</div>
           <div className="mt-1 font-display text-3xl font-bold text-brand-gradient">
-            ₹{r.estimated_total_cost_inr.toLocaleString("en-IN")}
+            ₹{(r.estimated_total_cost_inr || 0).toLocaleString("en-IN")}
           </div>
           <div className="mt-1 text-xs text-muted-foreground">
             {r.detected_travelers ?? 2} travelers · {r.detected_days ?? 5} days
           </div>
         </div>
 
-        {r.warnings.length > 0 && (
+        {r.warnings && r.warnings.length > 0 && (
           <div className="rounded-xl border border-destructive/30 bg-destructive/10 p-3 text-xs text-destructive">
             <AlertTriangle className="mb-1 inline h-3.5 w-3.5" /> {r.warnings.join(" · ")}
           </div>
         )}
 
-        {r.matched_destinations[0] && (
+        {r.matched_destinations && r.matched_destinations[0] && (
           <Link
             to="/optimize"
-            search={{ ids: r.matched_destinations.map((m) => m.destination.id).join(","), days: r.detected_days ?? 5, budget: r.detected_budget_inr ?? 0 }}
+            search={{ ids: r.matched_destinations.map((m: any) => m.destination.id).join(","), days: r.detected_days ?? 5, budget: r.detected_budget_inr ?? 0 }}
             className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-foreground px-4 py-2.5 text-sm font-semibold text-background hover:opacity-90"
           >
             Optimize this plan <ArrowRight className="h-4 w-4" />

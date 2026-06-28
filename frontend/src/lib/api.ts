@@ -46,4 +46,10 @@ export const api = {
   route: (body: any) => call<any>(`/travel/route`, { method: "POST", body: JSON.stringify(body) }),
   feedback: (body: { target_id: string; score: number; note?: string }) =>
     call<any>(`/feedback`, { method: "POST", body: JSON.stringify(body) }),
+  ai: {
+    dreamEnhance: (body: { name: string; interests: string[] }) =>
+      call<{ text: string }>(`/ai/dream-enhance`, { method: "POST", body: JSON.stringify(body) }),
+    planEnhance: (body: { destination: string }) =>
+      call<{ text: string }>(`/ai/plan-enhance`, { method: "POST", body: JSON.stringify(body) }),
+  },
 };

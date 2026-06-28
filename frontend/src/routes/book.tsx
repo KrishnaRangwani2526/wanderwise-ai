@@ -2,14 +2,69 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { Plane, Train, Hotel, ExternalLink, Save, User, Check, Star } from "lucide-react";
 import { DESTINATIONS } from "@/data/destinations";
-import {
-  searchFlights, searchTrains, searchHotels,
-  DEFAULT_PROFILE, type TravelerProfile, type FlightOption, type TrainOption, type HotelOption,
-} from "@/lib/engines/booking";
+import { api } from "@/lib/api";
 import { PageHero } from "@/components/PageHero";
 
 const PROFILE_KEY = "wc.travelerProfile";
 type Tab = "flights" | "trains" | "hotels";
+
+interface FlightOption {
+  id: string;
+  airline: string;
+  from: string;
+  to: string;
+  depart: string;
+  arrive: string;
+  stops: number;
+  duration_min: number;
+  class: "Economy" | "Premium Eco" | "Business";
+  price_inr: number;
+  baggage: string;
+  refundable: boolean;
+  external_url: string;
+}
+
+interface TrainOption {
+  id: string;
+  train_no: string;
+  name: string;
+  from: string;
+  to: string;
+  depart: string;
+  arrive: string;
+  duration_min: number;
+  class: "SL" | "3A" | "2A" | "1A";
+  price_inr: number;
+  availability: string;
+  external_url: string;
+}
+
+interface HotelOption {
+  id: string;
+  name: string;
+  area: string;
+  stars: 2 | 3 | 4 | 5;
+  rating: number;
+  price_per_night_inr: number;
+  amenities: string[];
+  refundable: boolean;
+  external_url: string;
+}
+
+interface TravelerProfile {
+  full_name: string;
+  email: string;
+  phone: string;
+  gov_id: string;
+  origin_city: string;
+  meal_pref: "veg" | "non-veg" | "vegan";
+  seat_pref: "window" | "aisle" | "no-pref";
+}
+
+const DEFAULT_PROFILE: TravelerProfile = {
+  full_name: "", email: "", phone: "", gov_id: "",
+  origin_city: "Delhi", meal_pref: "veg", seat_pref: "window",
+};
 
 export const Route = createFileRoute("/book")({
   head: () => ({
@@ -31,6 +86,10 @@ function BookPage() {
   const [profile, setProfile] = useState<TravelerProfile>(DEFAULT_PROFILE);
   const [saved, setSaved] = useState(false);
 
+  const [flights, setFlights] = useState<FlightOption[]>([]);
+  const [trains, setTrains] = useState<TrainOption[]>([]);
+  const [hotels, setHotels] = useState<HotelOption[]>([]);
+
   useEffect(() => {
     try {
       const raw = typeof window !== "undefined" ? window.localStorage.getItem(PROFILE_KEY) : null;
@@ -38,9 +97,21 @@ function BookPage() {
     } catch { /* ignore */ }
   }, []);
 
-  const flights = useMemo(() => searchFlights(destId, travelers), [destId, travelers]);
-  const trains = useMemo(() => searchTrains(destId, travelers), [destId, travelers]);
-  const hotels = useMemo(() => searchHotels(destId, nights), [destId, nights]);
+  useEffect(() => {
+    // Load booking options from backend
+    api.book({ destination_id: destId, travelers, nights, origin: profile.origin_city })
+      .then((data: any) => {
+        setFlights(data.flights || []);
+        setTrains(data.trains || []);
+        setHotels(data.hotels || []);
+      })
+      .catch(() => {
+        // Fallback to empty arrays if backend fails
+        setFlights([]);
+        setTrains([]);
+        setHotels([]);
+      });
+  }, [destId, travelers, nights, profile.origin_city]);
 
   function saveProfile() {
     if (typeof window === "undefined") return;

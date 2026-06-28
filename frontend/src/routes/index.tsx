@@ -81,7 +81,12 @@ function HeroCarousel() {
           className="absolute inset-0 transition-opacity duration-1000 ease-out"
           style={{ opacity: idx === i ? 1 : 0 }}
         >
-          <img src={s.img} alt={s.title} className="h-full w-full object-cover animate-[kenburns_18s_ease-in-out_infinite_alternate]" />
+          <img 
+            src={s.img} 
+            alt={s.title} 
+            loading={idx === 0 ? "eager" : "lazy"}
+            className="h-full w-full object-cover animate-[kenburns_18s_ease-in-out_infinite_alternate]" 
+          />
           <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/10 to-black/70" />
           <div className="absolute inset-0 bg-gradient-to-tr from-indigo-900/40 via-transparent to-orange-500/30" />
         </div>
