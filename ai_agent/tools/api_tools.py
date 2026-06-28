@@ -6,7 +6,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(
 from ai_agent.tools.registry import Tool
 from backend.engines.itinerary import plan_itinerary
 from backend.engines.booking import search_flights, search_hotels
-from backend.engines.scraper import scrape_url
+from ai_agent.scraper import scrape_url
 
 class ItineraryTool(Tool):
     def name(self) -> str: return "itinerary_planner"
