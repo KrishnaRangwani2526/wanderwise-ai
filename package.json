@@ -2,11 +2,9 @@
   "name": "wanderwise-ai-root",
   "private": true,
   "scripts": {
-    "dev": "cd frontend && vite dev",
-    "build": "cd frontend && vite build",
-    "build:dev": "cd frontend && vite build --mode development",
-    "preview": "cd frontend && vite preview",
-    "lint": "cd frontend && eslint .",
-    "typecheck": "cd frontend && tsgo --noEmit"
+    "dev": "cd frontend && bun run vite dev",
+    "build": "cd frontend && bun run vite build",
+    "build:dev": "cd frontend && bun run vite build --mode development",
+    "preview": "cd frontend && bun run vite preview"
   }
 }
