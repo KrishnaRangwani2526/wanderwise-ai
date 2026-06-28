@@ -2,9 +2,9 @@
   "name": "wanderwise-ai-root",
   "private": true,
   "scripts": {
-    "dev": "cd frontend && bun run vite dev",
-    "build": "cd frontend && bun run vite build",
-    "build:dev": "cd frontend && bun run vite build --mode development",
-    "preview": "cd frontend && bun run vite preview"
+    "dev": "bash scripts/dev.sh",
+    "build": "cd frontend && bunx --bun vite build",
+    "build:dev": "cd frontend && bunx --bun vite build --mode development",
+    "preview": "cd frontend && bunx --bun vite preview"
   }
 }
