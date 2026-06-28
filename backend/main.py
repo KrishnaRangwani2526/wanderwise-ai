@@ -122,11 +122,19 @@ class FeedbackReq(BaseModel):
 # -------- routes ---------------------------------------------------------
 @app.get("/health")
 def health():
+    keys = {
+        "gemini":        bool(os.getenv("GEMINI_API_KEY")),
+        "airlabs":       bool(os.getenv("AIRLABS_API_KEY")),
+        "aviationstack": bool(os.getenv("AVIATIONSTACK_API_KEY")),
+        "duffel":        bool(os.getenv("DUFFEL_API_KEY")),
+        "sandbox":       bool(os.getenv("SANDBOX_API_KEY")),
+    }
     return {
         "ok": True,
         "destinations": len(DESTINATIONS),
         "learned_itineraries": len(load("learned_itineraries", [])),
         "feedback_events": len(load("feedback", [])),
+        "api_keys": keys,
     }
 
 
