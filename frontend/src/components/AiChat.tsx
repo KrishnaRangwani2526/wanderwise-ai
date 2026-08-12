@@ -233,6 +233,7 @@ export function AiChatLauncher() {
                 </Link>
                 <Link
                   to="/plan"
+                  search={{ dest: undefined }}
                   onClick={() => setOpen(false)}
                   className="inline-flex items-center gap-1 rounded-full bg-indigo-50 px-2.5 py-1 text-[11px] font-semibold text-indigo-700 hover:bg-indigo-100"
                 >

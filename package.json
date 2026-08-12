@@ -3,8 +3,8 @@
   "private": true,
   "scripts": {
     "dev": "bash scripts/dev.sh",
-    "build": "cd frontend && bun install && ./node_modules/.bin/vite build",
-    "build:dev": "cd frontend && bun install && ./node_modules/.bin/vite build --mode development",
+    "build": "cd frontend && bun install && ./node_modules/.bin/vite build && cd .. && rm -rf dist && cp -r frontend/dist dist",
+    "build:dev": "cd frontend && bun install && ./node_modules/.bin/vite build --mode development && cd .. && rm -rf dist && cp -r frontend/dist dist",
     "preview": "cd frontend && ./node_modules/.bin/vite preview"
   }
 }
