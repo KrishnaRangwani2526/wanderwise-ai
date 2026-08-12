@@ -1,8 +1,14 @@
 {
   "extends": "./frontend/tsconfig.json",
-  "include": ["frontend/src/**/*.ts", "frontend/src/**/*.tsx"],
+  "include": [
+    "frontend/src/**/*.ts",
+    "frontend/src/**/*.tsx"
+  ],
   "compilerOptions": {
-    "baseUrl": ".",
-    "paths": { "@/*": ["./frontend/src/*"] }
+    "paths": {
+      "@/*": [
+        "./frontend/src/*"
+      ]
+    }
   }
 }
