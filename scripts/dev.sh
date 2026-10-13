@@ -11,7 +11,10 @@ pkill -f "uvicorn main:app" 2>/dev/null || true
   cd "$ROOT/backend"
   # auto-load .env so env vars are visible to uvicorn workers
   set -a; [ -f .env ] && . ./.env; set +a
-  exec python3 -m uvicorn main:app --host 0.0.0.0 --port 8000 --reload \
+  if [ ! -x .venv/bin/python ]; then
+    python3 -m venv .venv && .venv/bin/pip install -q -r requirements.txt
+  fi
+  exec .venv/bin/python -m uvicorn main:app --host 0.0.0.0 --port 8000 --reload \
        >>"$BACKEND_LOG" 2>&1
 ) &
 BACKEND_PID=$!
