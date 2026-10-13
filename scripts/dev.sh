@@ -21,4 +21,8 @@ trap 'echo "[dev] stopping backend $BACKEND_PID"; kill $BACKEND_PID 2>/dev/null 
 
 # --- Vite frontend (foreground, forwards CLI args like --port 8080) ---------
 cd "$ROOT/frontend"
+if [ ! -x ./node_modules/.bin/vite ]; then
+  echo "[dev] node_modules missing — running bun install"
+  bun install
+fi
 exec ./node_modules/.bin/vite dev "$@"
